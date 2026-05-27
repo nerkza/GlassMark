@@ -5,4 +5,4 @@ xcuserdata/
 *.xcuserstate
 *.swp
 *.tmp
-
+.clauge-worktrees/

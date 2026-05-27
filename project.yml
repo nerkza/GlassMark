@@ -1,0 +1,37 @@
+name: GlassMark
+options:
+  bundleIdPrefix: com.glassmark
+  deploymentTarget:
+    macOS: "15.0"
+  xcodeVersion: "26.0"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "15.0"
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: true
+packages: {}
+targets:
+  GlassMark:
+    type: application
+    platform: macOS
+    sources:
+      - path: GlassMark
+    entitlements:
+      path: GlassMark/GlassMark.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.glassmark.GlassMark
+        PRODUCT_NAME: GlassMark
+        INFOPLIST_KEY_CFBundleDisplayName: GlassMark
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        ENABLE_HARDENED_RUNTIME: true
+        CODE_SIGN_STYLE: Automatic
+    info:
+      path: GlassMark/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: GlassMark
+        CFBundleShortVersionString: "0.1"
+        CFBundleVersion: "1"
+        LSMinimumSystemVersion: "15.0"
+        NSPrincipalClass: NSApplication
