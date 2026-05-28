@@ -1,6 +1,6 @@
-# GlassMark
+# Glassmark
 
-GlassMark is a fast, native macOS Markdown editor that does one thing well: **edit Markdown with a beautiful live preview.**
+Glassmark is a fast, native macOS Markdown editor that does one thing well: **edit Markdown with a beautiful live preview.**
 
 It is a calm, local, folder-based writing surface — not a publishing platform, IDE, or PKM system. Open a folder, browse your `.md` files, write, and watch the rendered document update as you type.
 
@@ -89,7 +89,7 @@ The project is generated with [XcodeGen](https://github.com/yonyz/XcodeGen) from
 
 ## License
 
-GlassMark is released under the [MIT License](LICENSE).
+Glassmark is released under the [MIT License](LICENSE).
 
 ## Planning documents
 

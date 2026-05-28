@@ -7,7 +7,7 @@ struct WorkspaceSwitcherView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(workspaceStore.activeWorkspace?.displayName ?? "GlassMark")
+                    Text(workspaceStore.activeWorkspace?.displayName ?? "Glassmark")
                         .font(.headline)
                         .lineLimit(1)
                     Text(workspaceStore.activeWorkspace?.rootURL.path(percentEncoded: false) ?? "Local Markdown workspace")

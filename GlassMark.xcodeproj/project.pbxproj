@@ -555,7 +555,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.glassmark.GlassMarkTests;
 				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GlassMark.app/Contents/MacOS/GlassMark";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Glassmark.app/Contents/MacOS/Glassmark";
 			};
 			name = Debug;
 		};
@@ -572,7 +572,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.glassmark.GlassMarkTests;
 				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GlassMark.app/Contents/MacOS/GlassMark";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Glassmark.app/Contents/MacOS/Glassmark";
 			};
 			name = Release;
 		};
@@ -649,15 +649,16 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = GlassMark/Resources/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = GlassMark;
+				INFOPLIST_KEY_CFBundleDisplayName = Glassmark;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 GlassMark. Released under the MIT License.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Glassmark. Released under the MIT License.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.glassmark.GlassMark;
-				PRODUCT_NAME = GlassMark;
+				PRODUCT_MODULE_NAME = GlassMark;
+				PRODUCT_NAME = Glassmark;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -728,15 +729,16 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = GlassMark/Resources/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = GlassMark;
+				INFOPLIST_KEY_CFBundleDisplayName = Glassmark;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 GlassMark. Released under the MIT License.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Glassmark. Released under the MIT License.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.glassmark.GlassMark;
-				PRODUCT_NAME = GlassMark;
+				PRODUCT_MODULE_NAME = GlassMark;
+				PRODUCT_NAME = Glassmark;
 				SDKROOT = macosx;
 			};
 			name = Debug;

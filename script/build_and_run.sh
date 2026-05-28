@@ -12,7 +12,7 @@ if [[ ! -d "$PROJECT" ]]; then
   exit 1
 fi
 
-pkill -x GlassMark >/dev/null 2>&1 || true
+pkill -x Glassmark >/dev/null 2>&1 || true
 
 xcodebuild \
   -project "$PROJECT" \
@@ -21,7 +21,7 @@ xcodebuild \
   -derivedDataPath "$DERIVED_DATA" \
   build
 
-APP_PATH="$DERIVED_DATA/Build/Products/$CONFIGURATION/GlassMark.app"
+APP_PATH="$DERIVED_DATA/Build/Products/$CONFIGURATION/Glassmark.app"
 
 case "${1:-}" in
   --verify)
@@ -30,7 +30,7 @@ case "${1:-}" in
     ;;
   --logs)
     open -n "$APP_PATH"
-    log stream --style compact --predicate 'process == "GlassMark"'
+    log stream --style compact --predicate 'process == "Glassmark"'
     ;;
   *)
     open -n "$APP_PATH"
