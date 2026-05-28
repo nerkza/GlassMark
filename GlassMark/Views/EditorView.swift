@@ -20,7 +20,9 @@ struct EditorView: View {
                     ),
                     pendingCommand: pendingCommandBinding,
                     scrollRequest: scrollRequestBinding,
-                    activeLocation: activeLocationBinding
+                    activeLocation: activeLocationBinding,
+                    scrollSync: commandStore.scrollSync,
+                    onScroll: { commandStore.publishScroll(fraction: $0, source: .editor) }
                 )
             }
 
@@ -160,6 +162,8 @@ private struct MarkdownTextView: NSViewRepresentable {
     @Binding var pendingCommand: EditorCommandRequest?
     @Binding var scrollRequest: OutlineScrollRequest?
     @Binding var activeLocation: Int
+    let scrollSync: ScrollSync?
+    let onScroll: (Double) -> Void
 
     func makeCoordinator() -> Coordinator {
         Coordinator(text: $text, activeLocation: $activeLocation)
@@ -204,6 +208,7 @@ private struct MarkdownTextView: NSViewRepresentable {
         textView.string = text
         scrollView.documentView = textView
         context.coordinator.textView = textView
+        context.coordinator.onScroll = onScroll
         context.coordinator.observeScrolling(of: scrollView)
         context.coordinator.applyHighlighting()
         return scrollView
@@ -214,6 +219,13 @@ private struct MarkdownTextView: NSViewRepresentable {
 
         context.coordinator.text = $text
         context.coordinator.activeLocation = $activeLocation
+        context.coordinator.onScroll = onScroll
+
+        if let scrollSync, scrollSync.source == .preview,
+           context.coordinator.lastHandledSyncToken != scrollSync.token {
+            context.coordinator.lastHandledSyncToken = scrollSync.token
+            context.coordinator.applyExternalScroll(fraction: scrollSync.fraction)
+        }
 
         if textView.string != text {
             let selectedRanges = textView.selectedRanges
@@ -238,13 +250,16 @@ private struct MarkdownTextView: NSViewRepresentable {
     final class Coordinator: NSObject, NSTextViewDelegate {
         var text: Binding<String>
         var activeLocation: Binding<Int>
+        var onScroll: ((Double) -> Void)?
         weak var textView: NSTextView?
         var lastHandledCommandID: UUID?
         var lastHandledScrollID: UUID?
+        var lastHandledSyncToken: Int?
 
         private let highlighter = MarkdownSyntaxHighlighter()
         private let baseFont = NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
         private var isObservingScrolling = false
+        private var isApplyingExternalScroll = false
 
         init(text: Binding<String>, activeLocation: Binding<Int>) {
             self.text = text
@@ -270,6 +285,32 @@ private struct MarkdownTextView: NSViewRepresentable {
 
         @objc private func handleBoundsChange() {
             updateActiveLocation()
+            guard !isApplyingExternalScroll else { return }
+            publishScrollFraction()
+        }
+
+        private func publishScrollFraction() {
+            guard let textView,
+                  let scrollView = textView.enclosingScrollView,
+                  let documentView = scrollView.documentView else { return }
+            let clipView = scrollView.contentView
+            let maxY = max(0, documentView.frame.height - clipView.bounds.height)
+            let fraction = maxY > 0 ? clipView.bounds.origin.y / maxY : 0
+            onScroll?(Double(fraction))
+        }
+
+        func applyExternalScroll(fraction: Double) {
+            guard let textView,
+                  let scrollView = textView.enclosingScrollView,
+                  let documentView = scrollView.documentView else { return }
+            let clipView = scrollView.contentView
+            let maxY = max(0, documentView.frame.height - clipView.bounds.height)
+            isApplyingExternalScroll = true
+            clipView.setBoundsOrigin(NSPoint(x: 0, y: CGFloat(fraction) * maxY))
+            scrollView.reflectScrolledClipView(clipView)
+            DispatchQueue.main.async { [weak self] in
+                self?.isApplyingExternalScroll = false
+            }
         }
 
         func textDidChange(_ notification: Notification) {

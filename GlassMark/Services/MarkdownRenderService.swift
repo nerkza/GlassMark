@@ -109,21 +109,26 @@ struct MarkdownRenderService {
     // MARK: - Assets
 
     private static let script = """
+    var suppressScroll = false;
     function setContent(html) {
       var main = document.getElementById('content');
       var doc = document.scrollingElement || document.documentElement;
       var previousMax = doc.scrollHeight - doc.clientHeight;
       var ratio = previousMax > 0 ? doc.scrollTop / previousMax : 0;
+      suppressScroll = true;
       main.innerHTML = html;
       requestAnimationFrame(function () {
         var newMax = doc.scrollHeight - doc.clientHeight;
         doc.scrollTop = ratio * newMax;
+        setTimeout(function () { suppressScroll = false; }, 60);
       });
     }
     function scrollToFraction(fraction) {
+      suppressScroll = true;
       var doc = document.scrollingElement || document.documentElement;
       var max = doc.scrollHeight - doc.clientHeight;
-      doc.scrollTop = fraction * max;
+      doc.scrollTop = max > 0 ? fraction * max : 0;
+      setTimeout(function () { suppressScroll = false; }, 90);
     }
     function scrollToHeading(ordinal) {
       var headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
@@ -131,6 +136,15 @@ struct MarkdownRenderService {
         headings[ordinal].scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
+    window.addEventListener('scroll', function () {
+      if (suppressScroll) return;
+      var doc = document.scrollingElement || document.documentElement;
+      var max = doc.scrollHeight - doc.clientHeight;
+      var fraction = max > 0 ? doc.scrollTop / max : 0;
+      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.glassmarkScroll) {
+        window.webkit.messageHandlers.glassmarkScroll.postMessage(fraction);
+      }
+    }, { passive: true });
     """
 
     static let css = """

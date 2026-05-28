@@ -12,7 +12,9 @@ struct PreviewView: View {
                 markdown: document.text,
                 title: document.file.name,
                 baseURL: document.file.url.deletingLastPathComponent(),
-                scrollRequest: commandStore.outlineScrollRequest
+                scrollRequest: commandStore.outlineScrollRequest,
+                scrollSync: commandStore.scrollSync,
+                onScroll: { commandStore.publishScroll(fraction: $0, source: .preview) }
             )
         } else {
             ContentUnavailableView("Nothing to Preview", systemImage: "doc.text.magnifyingglass")
@@ -28,6 +30,8 @@ private struct WebPreview: NSViewRepresentable {
     let title: String
     let baseURL: URL
     let scrollRequest: OutlineScrollRequest?
+    let scrollSync: ScrollSync?
+    let onScroll: (Double) -> Void
 
     private let renderService = MarkdownRenderService()
 
@@ -38,11 +42,13 @@ private struct WebPreview: NSViewRepresentable {
     func makeNSView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
+        configuration.userContentController.add(context.coordinator, name: "glassmarkScroll")
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
         webView.setValue(false, forKey: "drawsBackground")
         context.coordinator.webView = webView
+        context.coordinator.onScroll = onScroll
 
         webView.loadHTMLString(renderService.documentShell(title: title), baseURL: baseURL)
         context.coordinator.scheduleRender(markdown: markdown)
@@ -50,19 +56,23 @@ private struct WebPreview: NSViewRepresentable {
     }
 
     func updateNSView(_ webView: WKWebView, context: Context) {
+        context.coordinator.onScroll = onScroll
         context.coordinator.scheduleRender(markdown: markdown)
         context.coordinator.handleScroll(request: scrollRequest)
+        context.coordinator.handleScrollSync(scrollSync)
     }
 
     @MainActor
-    final class Coordinator: NSObject, WKNavigationDelegate {
+    final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         weak var webView: WKWebView?
+        var onScroll: ((Double) -> Void)?
         private let renderService: MarkdownRenderService
         private var isShellLoaded = false
         private var pendingMarkdown: String?
         private var latestMarkdown: String = ""
         private var renderWorkItem: DispatchWorkItem?
         private var lastHandledScrollID: UUID?
+        private var lastHandledSyncToken: Int?
 
         init(renderService: MarkdownRenderService) {
             self.renderService = renderService
@@ -75,6 +85,23 @@ private struct WebPreview: NSViewRepresentable {
             // Defer slightly so any pending content update is applied first.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
                 self?.webView?.evaluateJavaScript("scrollToHeading(\(ordinal));", completionHandler: nil)
+            }
+        }
+
+        func handleScrollSync(_ sync: ScrollSync?) {
+            guard let sync, sync.source == .editor, lastHandledSyncToken != sync.token else { return }
+            lastHandledSyncToken = sync.token
+            webView?.evaluateJavaScript("scrollToFraction(\(sync.fraction));", completionHandler: nil)
+        }
+
+        nonisolated func userContentController(
+            _ userContentController: WKUserContentController,
+            didReceive message: WKScriptMessage
+        ) {
+            // Script messages are always delivered on the main thread.
+            MainActor.assumeIsolated {
+                guard let fraction = (message.body as? NSNumber)?.doubleValue else { return }
+                onScroll?(fraction)
             }
         }
 

@@ -7,6 +7,7 @@ It is a calm, local, folder-based writing surface — not a publishing platform,
 ## Features
 
 - **Live preview** that updates as you type, with smooth, flicker-free rendering and preserved scroll position.
+- **Synced scrolling** between the editor and preview in split mode, in both directions.
 - **GitHub-flavored Markdown** rendering: headings, bold/italic/strikethrough, links, images, fenced code blocks, blockquotes, nested lists, task lists, tables, and autolinks — all rendered with a clean, GitHub-style stylesheet that adapts to light and dark mode.
 - **In-editor syntax highlighting** for headings, emphasis, code, links, blockquotes, and list markers.
 - **Editor / Split / Preview** view modes.

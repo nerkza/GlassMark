@@ -11,6 +11,11 @@ final class CommandStore: ObservableObject {
     /// UTF-16 offset at the top of the editor viewport, used to highlight the
     /// current heading in the outline (scroll-spy).
     @Published var activeOutlineCharacterIndex: Int = 0
+    /// Latest proportional scroll position, used to keep the editor and preview
+    /// panes aligned in split mode.
+    @Published var scrollSync: ScrollSync?
+
+    private var scrollSyncToken = 0
 
     func presentQuickOpen() {
         isQuickOpenPresented = true
@@ -26,5 +31,10 @@ final class CommandStore: ObservableObject {
 
     func scrollToOutlineItem(characterIndex: Int, headingOrdinal: Int) {
         outlineScrollRequest = OutlineScrollRequest(characterIndex: characterIndex, headingOrdinal: headingOrdinal)
+    }
+
+    func publishScroll(fraction: Double, source: ScrollSource) {
+        scrollSyncToken += 1
+        scrollSync = ScrollSync(token: scrollSyncToken, fraction: fraction, source: source)
     }
 }

@@ -31,3 +31,17 @@ struct OutlineScrollRequest: Identifiable, Equatable {
     /// Position of the heading among all document headings (used by the preview).
     let headingOrdinal: Int
 }
+
+/// Which split pane originated a scroll, so the other pane can follow without
+/// echoing back.
+enum ScrollSource: Equatable {
+    case editor
+    case preview
+}
+
+/// A proportional scroll position shared between the editor and preview panes.
+struct ScrollSync: Equatable {
+    let token: Int
+    let fraction: Double
+    let source: ScrollSource
+}
