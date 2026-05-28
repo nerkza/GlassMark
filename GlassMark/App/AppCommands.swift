@@ -24,6 +24,12 @@ struct AppCommands: Commands {
         }
 
         CommandGroup(after: .saveItem) {
+            Button("Save") {
+                documentStore.save()
+            }
+            .keyboardShortcut("s", modifiers: [.command])
+            .disabled(!documentStore.canSave)
+
             Divider()
 
             Button("Export as HTML…") {

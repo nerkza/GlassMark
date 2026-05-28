@@ -15,6 +15,7 @@ struct PreviewView: View {
                 markdown: document.text,
                 title: document.file.name,
                 baseURL: document.file.url.deletingLastPathComponent(),
+                scopeURL: document.workspaceRootURL,
                 themeCSS: renderService.themeCSS(preferencesStore.previewTheme, customCSS: preferencesStore.customPreviewCSS),
                 scrollRequest: commandStore.outlineScrollRequest,
                 scrollSync: commandStore.scrollSync,
@@ -33,6 +34,7 @@ private struct WebPreview: NSViewRepresentable {
     let markdown: String
     let title: String
     let baseURL: URL
+    let scopeURL: URL
     let themeCSS: String
     let scrollRequest: OutlineScrollRequest?
     let scrollSync: ScrollSync?
@@ -56,13 +58,20 @@ private struct WebPreview: NSViewRepresentable {
         context.coordinator.webView = webView
         context.coordinator.onScroll = onScroll
 
-        webView.loadHTMLString(renderService.documentShell(title: title), baseURL: baseURL)
+        AssetSchemeHandler.shared.setDocumentContext(directory: baseURL, securityScopeURL: scopeURL)
+        // Use the custom scheme (not file://) as the base URL so the sandboxed
+        // WebContent process can commit the page and resolve resources.
+        webView.loadHTMLString(
+            renderService.documentShell(title: title),
+            baseURL: URL(string: "\(AssetSchemeHandler.scheme)://app/")
+        )
         context.coordinator.applyTheme(themeCSS)
         context.coordinator.scheduleRender(markdown: markdown)
         return webView
     }
 
     func updateNSView(_ webView: WKWebView, context: Context) {
+        AssetSchemeHandler.shared.setDocumentContext(directory: baseURL, securityScopeURL: scopeURL)
         context.coordinator.onScroll = onScroll
         context.coordinator.applyTheme(themeCSS)
         context.coordinator.scheduleRender(markdown: markdown)
