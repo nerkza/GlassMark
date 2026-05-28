@@ -1,8 +1,43 @@
+# macOS
 .DS_Store
-.build/
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Xcode — build output & user state
+build/
 DerivedData/
-xcuserdata/
 *.xcuserstate
+xcuserdata/
+*.xcuserdatad/
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+Package.pins
+
+# Dependency managers (unused, ignored defensively)
+Pods/
+Carthage/Build/
+
+# Editor / scratch files
 *.swp
 *.tmp
+*.orig
+*~
+
+# Local agent / tooling environments (not for the public repo)
+.codex/
 .clauge-worktrees/
+
+# Logs
+*.log
