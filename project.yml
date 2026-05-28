@@ -53,6 +53,7 @@ targets:
         LSMinimumSystemVersion: "15.0"
         NSPrincipalClass: NSApplication
         ITSAppUsesNonExemptEncryption: false
+        LSApplicationCategoryType: public.app-category.productivity
   GlassMarkTests:
     type: bundle.unit-test
     platform: macOS
