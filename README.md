@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/glassmark-icon.png" alt="Glassmark" width="120" />
+  <img src="assets/glassmark-icon.png" alt="Glassmark" width="120" />
 </p>
 
 <h1 align="center">Glassmark</h1>
@@ -28,7 +28,6 @@
   <a href="#installation">Installation</a> ·
   <a href="#keyboard-shortcuts">Shortcuts</a> ·
   <a href="#building-from-source">Build</a> ·
-  <a href="docs/roadmap.md">Roadmap</a> ·
   <a href="https://github.com/nerkza/GlassMark/issues">Report a bug</a>
 </p>
 
@@ -37,7 +36,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/split-welcome.png" alt="Glassmark split-view editor and live preview" width="900" />
+  <img src="assets/split-welcome.png" alt="Glassmark split-view editor and live preview" width="900" />
 </p>
 
 ---
@@ -51,12 +50,12 @@ Everything renders **natively and offline**: code highlighting, math, and diagra
 ## Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/code-and-math.png" alt="Syntax-highlighted code and KaTeX math" width="900" />
+  <img src="assets/code-and-math.png" alt="Syntax-highlighted code and KaTeX math" width="900" />
 </p>
 <p align="center"><em>Syntax-highlighted code (highlight.js) and rendered math (KaTeX) — all offline.</em></p>
 
 <p align="center">
-  <img src="docs/screenshots/diagrams.png" alt="Mermaid diagrams rendered in the preview" width="900" />
+  <img src="assets/diagrams.png" alt="Mermaid diagrams rendered in the preview" width="900" />
 </p>
 <p align="center"><em>Mermaid diagrams and GFM tables, rendered live as you type.</em></p>
 
@@ -153,8 +152,6 @@ xcodebuild -project GlassMark.xcodeproj -scheme GlassMark -derivedDataPath Deriv
 - **Vendored web assets** (highlight.js, KaTeX, Mermaid) served to the preview over a custom `WKURLSchemeHandler`, so the preview is fully offline.
 - Clear separation of **stores** (workspace, document, command, preferences) and **services** (file tree, persistence, rendering, export).
 
-See [docs/architecture-plan.md](docs/architecture-plan.md) and [docs/product-plan.md](docs/product-plan.md) for the full design.
-
 ---
 
 ## Roadmap
@@ -165,8 +162,6 @@ Glassmark is at its **1.0** milestone. Things on the horizon (kept in scope — 
 - On-demand table column alignment
 - Incremental preview DOM updates
 - Larger-workspace performance profiling
-
-The full history and plan live in [docs/roadmap.md](docs/roadmap.md).
 
 ---
 
