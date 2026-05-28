@@ -36,15 +36,23 @@ struct MarkdownRenderService {
           <meta name="viewport" content="width=device-width, initial-scale=1">
           <title>\(escape(title))</title>
           <style>\(Self.css)</style>
+          <link rel="stylesheet" href="\(Self.asset)/katex.min.css">
+          <link rel="stylesheet" href="\(Self.asset)/github.min.css" media="(prefers-color-scheme: light)">
+          <link rel="stylesheet" href="\(Self.asset)/github-dark.min.css" media="(prefers-color-scheme: dark)">
           <style id="userTheme"></style>
         </head>
         <body>
           <main id="content"></main>
+          <script src="\(Self.asset)/highlight.min.js"></script>
+          <script src="\(Self.asset)/katex.min.js"></script>
+          <script src="\(Self.asset)/auto-render.min.js"></script>
           <script>\(Self.script)</script>
         </body>
         </html>
         """
     }
+
+    private static let asset = "glassmark-asset://app"
 
     /// Combined theme + custom CSS injected into the preview via `setTheme`.
     func themeCSS(_ theme: PreviewTheme, customCSS: String) -> String {
@@ -138,6 +146,7 @@ struct MarkdownRenderService {
         var newMax = doc.scrollHeight - doc.clientHeight;
         doc.scrollTop = ratio * newMax;
         setTimeout(function () { suppressScroll = false; }, 60);
+        initEnhancements();
       });
     }
     function absoluteTop(el) {
@@ -165,6 +174,59 @@ struct MarkdownRenderService {
     function setTheme(css) {
       var el = document.getElementById('userTheme');
       if (el) { el.textContent = css; }
+    }
+    function initEnhancements() {
+      var content = document.getElementById('content');
+      if (!content) return;
+      try {
+        if (window.hljs) {
+          content.querySelectorAll('pre code:not(.language-mermaid)').forEach(function (block) {
+            if (!block.dataset.hl) { window.hljs.highlightElement(block); block.dataset.hl = '1'; }
+          });
+        }
+      } catch (e) {}
+      try {
+        if (window.renderMathInElement) {
+          window.renderMathInElement(content, {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$', right: '$', display: false }
+            ],
+            throwOnError: false
+          });
+        }
+      } catch (e) {}
+      renderMermaid(content);
+    }
+    function ensureMermaid(callback) {
+      if (window.mermaid) { callback(); return; }
+      if (window.__mermaidLoading) { window.__mermaidQueue.push(callback); return; }
+      window.__mermaidLoading = true;
+      window.__mermaidQueue = [callback];
+      var script = document.createElement('script');
+      script.src = 'glassmark-asset://app/mermaid.min.js';
+      script.onload = function () {
+        try { window.mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'strict' }); } catch (e) {}
+        window.__mermaidLoading = false;
+        var queue = window.__mermaidQueue || [];
+        window.__mermaidQueue = [];
+        queue.forEach(function (cb) { cb(); });
+      };
+      document.head.appendChild(script);
+    }
+    function renderMermaid(content) {
+      var blocks = content.querySelectorAll('code.language-mermaid');
+      if (!blocks.length) return;
+      ensureMermaid(function () {
+        content.querySelectorAll('code.language-mermaid').forEach(function (code) {
+          var pre = code.parentElement;
+          var holder = document.createElement('div');
+          holder.className = 'mermaid';
+          holder.textContent = code.textContent;
+          if (pre && pre.parentNode) { pre.parentNode.replaceChild(holder, pre); }
+        });
+        try { window.mermaid.run({ querySelector: '#content .mermaid' }); } catch (e) {}
+      });
     }
     window.addEventListener('scroll', function () {
       if (suppressScroll) return;
@@ -272,6 +334,8 @@ struct MarkdownRenderService {
     .footnotes { margin-top: 3em; font-size: 0.9em; color: color-mix(in srgb, CanvasText 78%, Canvas); }
     .footnotes hr { margin-bottom: 1.2em; }
     .footnote-back { text-decoration: none; padding-left: 0.3em; }
+    .mermaid { text-align: center; margin: 1.3em 0; }
+    .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
     .frontmatter {
       margin: 0 0 1.4em;
       padding: 4px 16px;

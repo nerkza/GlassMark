@@ -48,6 +48,7 @@ private struct WebPreview: NSViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
         configuration.userContentController.add(context.coordinator, name: "glassmarkScroll")
+        configuration.setURLSchemeHandler(AssetSchemeHandler.shared, forURLScheme: AssetSchemeHandler.scheme)
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
