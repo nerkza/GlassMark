@@ -33,6 +33,10 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Mac%20App%20Store-Coming%20Soon-0D96F6?style=for-the-badge&logo=apple&logoColor=white" alt="Coming soon to the Mac App Store" height="38" />
+</p>
+
+<p align="center">
   <img src="docs/screenshots/split-welcome.png" alt="Glassmark split-view editor and live preview" width="900" />
 </p>
 
@@ -83,7 +87,7 @@ Built with SwiftUI and an AppKit `NSTextView` editor, a `WKWebView` preview, and
 
 ## Installation
 
-> **Note:** Prebuilt releases are coming. For now, build from source (it takes under a minute).
+> 🍎 **Coming soon to the Mac App Store.** In the meantime, build from source (it takes under a minute).
 
 ### Build from source
 
