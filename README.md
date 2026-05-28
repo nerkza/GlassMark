@@ -32,6 +32,10 @@
   <a href="https://github.com/nerkza/GlassMark/issues">Report a bug</a>
 </p>
 
+<p align="center">
+  <img src="docs/screenshots/split-welcome.png" alt="Glassmark split-view editor and live preview" width="900" />
+</p>
+
 ---
 
 Most Markdown apps want to be a publishing platform, an IDE, or a second brain. Glassmark wants to be the calmest, fastest way to **write Markdown and see it rendered as you type**. Open a folder, browse your `.md` files in a sidebar, edit on the left, watch the preview keep pace on the right. That's it — and it's polished to a shine.
@@ -42,17 +46,15 @@ Everything renders **natively and offline**: code highlighting, math, and diagra
 
 ## Screenshots
 
-<!--
-  Drop screenshots into docs/screenshots/ and uncomment the block below.
-  A split-view shot (editor + live preview) and a dark-mode shot work great here.
+<p align="center">
+  <img src="docs/screenshots/code-and-math.png" alt="Syntax-highlighted code and KaTeX math" width="900" />
+</p>
+<p align="center"><em>Syntax-highlighted code (highlight.js) and rendered math (KaTeX) — all offline.</em></p>
 
 <p align="center">
-  <img src="docs/screenshots/split.png" alt="Glassmark split view" width="49%" />
-  <img src="docs/screenshots/dark.png" alt="Glassmark dark mode" width="49%" />
+  <img src="docs/screenshots/diagrams.png" alt="Mermaid diagrams rendered in the preview" width="900" />
 </p>
--->
-
-> _Split editor + live preview, outline navigation, and offline math/diagram rendering._
+<p align="center"><em>Mermaid diagrams and GFM tables, rendered live as you type.</em></p>
 
 ---
 
