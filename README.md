@@ -104,6 +104,10 @@ Or build and launch from the command line:
 script/build_and_run.sh
 ```
 
+### Updates
+
+The **Mac App Store** build updates itself automatically. The **direct-download** build (notarized [Releases](https://github.com/nerkza/GlassMark/releases)) checks GitHub for a newer version on launch and offers to open the download page — toggleable in **Settings → General**, and it sends no personal data. Maintainers cut a release with `script/release.sh` (see the script header for the one-time signing/notarization setup).
+
 ---
 
 ## Keyboard shortcuts

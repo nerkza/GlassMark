@@ -35,6 +35,13 @@ private struct GeneralSettingsView: View {
             Text("When on, edits are written to disk automatically a moment after you stop typing. Manual save (⌘S) is always available.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+
+            #if DIRECT_DISTRIBUTION
+            Toggle("Check for updates on launch", isOn: $preferencesStore.automaticUpdateChecks)
+            Text("Checks GitHub for a newer release when Glassmark starts. No other data is sent.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            #endif
         }
         .padding(24)
     }

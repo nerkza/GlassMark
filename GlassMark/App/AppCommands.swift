@@ -7,6 +7,14 @@ struct AppCommands: Commands {
     @ObservedObject var preferencesStore: PreferencesStore
 
     var body: some Commands {
+        #if DIRECT_DISTRIBUTION
+        CommandGroup(after: .appInfo) {
+            Button("Check for Updates…") {
+                NotificationCenter.default.post(name: .glassmarkCheckForUpdates, object: nil)
+            }
+        }
+        #endif
+
         CommandGroup(after: .newItem) {
             Button("New Markdown File") {
                 guard let file = workspaceStore.createMarkdownFile(),

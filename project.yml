@@ -4,6 +4,11 @@ options:
   deploymentTarget:
     macOS: "15.0"
   xcodeVersion: "26.0"
+configs:
+  Debug: debug
+  Release: release
+  # Direct (notarized) distribution build — includes the in-app updater.
+  ReleaseDirect: release
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -39,16 +44,25 @@ targets:
         ENABLE_HARDENED_RUNTIME: true
         CODE_SIGN_STYLE: Automatic
       configs:
+        # DIRECT_DISTRIBUTION gates the in-app updater. It's on for Debug (so the
+        # code compiles and is unit-testable) and for ReleaseDirect (notarized
+        # direct download), but OFF for Release — the App Store build must not
+        # contain any self-update mechanism.
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG DIRECT_DISTRIBUTION
         # Preselect the Recurse LTD team for App Store archiving. Release-only so
         # local Debug/test builds keep signing ad-hoc (there's no Recurse LTD
         # development cert on the machine, only the distribution one).
         Release:
           DEVELOPMENT_TEAM: R57FJUULSB
+        ReleaseDirect:
+          DEVELOPMENT_TEAM: R57FJUULSB
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DIRECT_DISTRIBUTION
     info:
       path: GlassMark/Resources/Info.plist
       properties:
         CFBundleDisplayName: Glassmark
-        CFBundleShortVersionString: "1.0"
+        CFBundleShortVersionString: "1.1"
         CFBundleVersion: "1"
         LSMinimumSystemVersion: "15.0"
         NSPrincipalClass: NSApplication
@@ -79,3 +93,7 @@ schemes:
         - GlassMarkTests
     run:
       config: Debug
+    archive:
+      # App Store archive uses Release (no updater). Direct releases are built
+      # with -configuration ReleaseDirect via script/release.sh.
+      config: Release

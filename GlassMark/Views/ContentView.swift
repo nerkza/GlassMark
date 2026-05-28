@@ -49,6 +49,7 @@ struct ContentView: View {
                 documentStore.open(file, workspace: workspace)
             }
         }
+        .glassmarkUpdater()
     }
 
     @ToolbarContentBuilder

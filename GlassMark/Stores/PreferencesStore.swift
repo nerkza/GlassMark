@@ -9,6 +9,8 @@ final class PreferencesStore: ObservableObject {
     @AppStorage("customPreviewCSS") var customPreviewCSS = ""
     @AppStorage("focusModeEnabled") var focusModeEnabled = false
     @AppStorage("typewriterModeEnabled") var typewriterModeEnabled = false
+    /// Direct-download build only: check GitHub for a newer release on launch.
+    @AppStorage("automaticUpdateChecks") var automaticUpdateChecks = true
 
     var resolvedColorScheme: ColorScheme? {
         switch appearancePreference {

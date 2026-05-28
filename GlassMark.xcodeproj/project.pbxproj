@@ -22,6 +22,8 @@
 		3209BEE25DAF9352B290D433 /* KaTeX_SansSerif-Italic.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 1D734E777366DE8122FF1106 /* KaTeX_SansSerif-Italic.woff2 */; };
 		37655FE0FF572EF6057C050A /* MarkdownHTMLRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDADA252A158236AF53157B /* MarkdownHTMLRendererTests.swift */; };
 		380C3703E5BD652D75BFB1C0 /* MarkdownExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324A674D7C4F63CD5677015D /* MarkdownExporter.swift */; };
+		3D4E1BA97FE2B3D1336DB190 /* UpdateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C765C65B89684399A796E33 /* UpdateStore.swift */; };
+		3D8D3DBF34E76499E3A870C7 /* UpdateCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CACF996890357B976DA0934 /* UpdateCheckerTests.swift */; };
 		406FB1C54A686ECFD5C46DDF /* katex.min.css in Resources */ = {isa = PBXBuildFile; fileRef = A469BE91592CA0F31B051A1F /* katex.min.css */; };
 		4518C0D41667F7D444DB79E4 /* KaTeX_Size2-Regular.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = EDB13AE8F7B0513AD206EA4F /* KaTeX_Size2-Regular.woff2 */; };
 		463A9E4853783D2D6991DF6E /* WorkspaceSwitcherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F225EFDC1119771C780D4CB /* WorkspaceSwitcherView.swift */; };
@@ -30,6 +32,7 @@
 		50A244437846B6392B8F488C /* KaTeX_Size4-Regular.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 3C606541A2DB3F99A443AF89 /* KaTeX_Size4-Regular.woff2 */; };
 		50A702C828470CF4E8EA0A36 /* MarkdownSyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAE300328D09590456151F8 /* MarkdownSyntaxHighlighter.swift */; };
 		50C939EBF9DF861FEBBB2BC6 /* katex.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 9B8F262C21D56C0C04915275 /* katex.min.js */; };
+		51DDBA3FE9C4B47BCA405C87 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 994F0391E4D58E639BA63C8B /* UpdateChecker.swift */; };
 		5A16851BFEE00470439D30E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E79794F48E678F04630311A /* Assets.xcassets */; };
 		5CC824CFA5B14A7A43F1FB8C /* KaTeX_Size3-Regular.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 7A86197A365BE748D35D6DBE /* KaTeX_Size3-Regular.woff2 */; };
 		5EC581F205A9CC73E8B5CE1A /* DocumentStatisticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDB7AADBF5223AE29CD871EF /* DocumentStatisticsTests.swift */; };
@@ -62,6 +65,7 @@
 		B1FB07C32FDEEEBF3D88C051 /* PreferencesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 989E01843356B195100F761A /* PreferencesStore.swift */; };
 		B458180FA9207271DAE366EB /* KaTeX_Main-BoldItalic.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 7CC3A5E2B3BDF79845D922DE /* KaTeX_Main-BoldItalic.woff2 */; };
 		BC8324EFA511DEEA53F9263B /* KaTeX_Math-Italic.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 2F097E8B22552F26FEAA539F /* KaTeX_Math-Italic.woff2 */; };
+		BD13B7F33F135625C43A38B8 /* UpdaterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACEB674EEB5DB35BA3BE8A78 /* UpdaterView.swift */; };
 		C088AA5235B41BCBD92F3B23 /* KaTeX_Caligraphic-Regular.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = EC7E9042F609796AC6E41E26 /* KaTeX_Caligraphic-Regular.woff2 */; };
 		CC1ABAC4AAC3495CB0213321 /* KaTeX_Main-Italic.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 3D42AA4658591B4EBCE35A80 /* KaTeX_Main-Italic.woff2 */; };
 		D1484A0B6350E0E2B888CB6E /* auto-render.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 0B044069DB06B14F36CA3A5A /* auto-render.min.js */; };
@@ -105,6 +109,7 @@
 		382187CF624ADE7D715BCF7C /* KaTeX_Size1-Regular.woff2 */ = {isa = PBXFileReference; path = "KaTeX_Size1-Regular.woff2"; sourceTree = "<group>"; };
 		3A411A4CABEA7C2613AE360C /* KaTeX_Fraktur-Bold.woff2 */ = {isa = PBXFileReference; path = "KaTeX_Fraktur-Bold.woff2"; sourceTree = "<group>"; };
 		3C606541A2DB3F99A443AF89 /* KaTeX_Size4-Regular.woff2 */ = {isa = PBXFileReference; path = "KaTeX_Size4-Regular.woff2"; sourceTree = "<group>"; };
+		3C765C65B89684399A796E33 /* UpdateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateStore.swift; sourceTree = "<group>"; };
 		3D42AA4658591B4EBCE35A80 /* KaTeX_Main-Italic.woff2 */ = {isa = PBXFileReference; path = "KaTeX_Main-Italic.woff2"; sourceTree = "<group>"; };
 		41F94C8A2E6D2F16F31B308C /* FilePersistenceServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePersistenceServiceTests.swift; sourceTree = "<group>"; };
 		4F225EFDC1119771C780D4CB /* WorkspaceSwitcherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSwitcherView.swift; sourceTree = "<group>"; };
@@ -114,6 +119,7 @@
 		55AB95D7E289ADD620F995DD /* glassmark-iconset.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = "glassmark-iconset.icon"; sourceTree = "<group>"; };
 		579A963ABA6FC838ED69E19E /* KaTeX_Math-BoldItalic.woff2 */ = {isa = PBXFileReference; path = "KaTeX_Math-BoldItalic.woff2"; sourceTree = "<group>"; };
 		5B7CB20F34B385B7863B111E /* MarkdownSyntaxHighlighterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownSyntaxHighlighterTests.swift; sourceTree = "<group>"; };
+		5CACF996890357B976DA0934 /* UpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckerTests.swift; sourceTree = "<group>"; };
 		5FE830B916B2ADC183CC6CAF /* GlassMarkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassMarkApp.swift; sourceTree = "<group>"; };
 		62AA4EC56945EAD7D6C830D9 /* KaTeX_SansSerif-Bold.woff2 */ = {isa = PBXFileReference; path = "KaTeX_SansSerif-Bold.woff2"; sourceTree = "<group>"; };
 		64A0CCD3610A29544C5812FF /* KaTeX_Typewriter-Regular.woff2 */ = {isa = PBXFileReference; path = "KaTeX_Typewriter-Regular.woff2"; sourceTree = "<group>"; };
@@ -141,12 +147,14 @@
 		92BF41D55CECD0F217B1A6A0 /* MarkdownOutline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownOutline.swift; sourceTree = "<group>"; };
 		92EBB48BE7A5E9D765A3FA91 /* github.min.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = github.min.css; sourceTree = "<group>"; };
 		989E01843356B195100F761A /* PreferencesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesStore.swift; sourceTree = "<group>"; };
+		994F0391E4D58E639BA63C8B /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		9B8F262C21D56C0C04915275 /* katex.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = katex.min.js; sourceTree = "<group>"; };
 		9FAE300328D09590456151F8 /* MarkdownSyntaxHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownSyntaxHighlighter.swift; sourceTree = "<group>"; };
 		A469BE91592CA0F31B051A1F /* katex.min.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = katex.min.css; sourceTree = "<group>"; };
 		A4B688961A8CD4F4BEFE2963 /* WorkspaceFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceFile.swift; sourceTree = "<group>"; };
 		A753A5B1D93A6B7B97D85BA7 /* URLSecurityScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSecurityScope.swift; sourceTree = "<group>"; };
 		A85BF28F5A4D07905596E0A3 /* FileTreeServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeServiceTests.swift; sourceTree = "<group>"; };
+		ACEB674EEB5DB35BA3BE8A78 /* UpdaterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterView.swift; sourceTree = "<group>"; };
 		BC59FF90F0359F50C324880D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C472D5B2B72966E6A0343D8B /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
 		C5E31AB52A7EB98275D36E7F /* MarkdownRenderServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderServiceTests.swift; sourceTree = "<group>"; };
@@ -197,6 +205,7 @@
 				CA8DF8B79514D2C48E56D21F /* QuickOpenView.swift */,
 				BC59FF90F0359F50C324880D /* SettingsView.swift */,
 				67858FF63E50102B7451AD6F /* SidebarView.swift */,
+				ACEB674EEB5DB35BA3BE8A78 /* UpdaterView.swift */,
 				4F225EFDC1119771C780D4CB /* WorkspaceSwitcherView.swift */,
 			);
 			path = Views;
@@ -226,6 +235,7 @@
 				7635915AB026B2E0E2A3F797 /* CommandStore.swift */,
 				79A5FEB48D2E9855A34285EC /* DocumentStore.swift */,
 				989E01843356B195100F761A /* PreferencesStore.swift */,
+				3C765C65B89684399A796E33 /* UpdateStore.swift */,
 				8C4237CCF9896FAF189B6474 /* WorkspaceStore.swift */,
 			);
 			path = Stores;
@@ -309,6 +319,7 @@
 				324A674D7C4F63CD5677015D /* MarkdownExporter.swift */,
 				68EFFC1FF157A3EC29D54DBA /* MarkdownHTMLRenderer.swift */,
 				71B537C2617DACC85FE470C8 /* MarkdownRenderService.swift */,
+				994F0391E4D58E639BA63C8B /* UpdateChecker.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -359,6 +370,7 @@
 				DD23393D87FE27250F8C6E59 /* MarkdownOutlineTests.swift */,
 				C5E31AB52A7EB98275D36E7F /* MarkdownRenderServiceTests.swift */,
 				5B7CB20F34B385B7863B111E /* MarkdownSyntaxHighlighterTests.swift */,
+				5CACF996890357B976DA0934 /* UpdateCheckerTests.swift */,
 				0E1896982C23ACDB5BF92C19 /* WorkspaceFileTests.swift */,
 			);
 			path = GlassMarkTests;
@@ -489,6 +501,7 @@
 				834B67626485EB6516619384 /* MarkdownOutlineTests.swift in Sources */,
 				8428C790AE356C8462224110 /* MarkdownRenderServiceTests.swift in Sources */,
 				65ECB6D61B19BFE12843D0C1 /* MarkdownSyntaxHighlighterTests.swift in Sources */,
+				3D8D3DBF34E76499E3A870C7 /* UpdateCheckerTests.swift in Sources */,
 				EA47402FFADBB596C5CE8954 /* WorkspaceFileTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -523,6 +536,9 @@
 				D94B1555B6C3CD0909482807 /* SettingsView.swift in Sources */,
 				162B3EF1A2E7F788CE938441 /* SidebarView.swift in Sources */,
 				FDDEBCFF5735D22B3FF88AE3 /* URLSecurityScope.swift in Sources */,
+				51DDBA3FE9C4B47BCA405C87 /* UpdateChecker.swift in Sources */,
+				3D4E1BA97FE2B3D1336DB190 /* UpdateStore.swift in Sources */,
+				BD13B7F33F135625C43A38B8 /* UpdaterView.swift in Sources */,
 				155B4B8E48B624EAAD4717AE /* ViewMode.swift in Sources */,
 				4DBEFF66A722406E8C4C7859 /* Workspace.swift in Sources */,
 				70CD7AF99840E813719D01C3 /* WorkspaceFile.swift in Sources */,
@@ -542,6 +558,88 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		09AC40A0EE10523BD0A00682 /* ReleaseDirect */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = ReleaseDirect;
+		};
+		2E8C1B111191DA32ED32668C /* ReleaseDirect */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "glassmark-iconset";
+				CODE_SIGN_ENTITLEMENTS = GlassMark/GlassMark.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = R57FJUULSB;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = GlassMark/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Glassmark;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Glassmark. Released under the MIT License.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.recurse.glassmark;
+				PRODUCT_MODULE_NAME = GlassMark;
+				PRODUCT_NAME = Glassmark;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DIRECT_DISTRIBUTION;
+			};
+			name = ReleaseDirect;
+		};
 		31D8A1D201FD10B9158BB382 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -575,6 +673,23 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Glassmark.app/Contents/MacOS/Glassmark";
 			};
 			name = Release;
+		};
+		A7228AD6E0975A198EF6393F /* ReleaseDirect */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.recurse.glassmark.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Glassmark.app/Contents/MacOS/Glassmark";
+			};
+			name = ReleaseDirect;
 		};
 		D68E631C0F0BCF1AB8D56169 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -741,6 +856,7 @@
 				PRODUCT_MODULE_NAME = GlassMark;
 				PRODUCT_NAME = Glassmark;
 				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG DIRECT_DISTRIBUTION";
 			};
 			name = Debug;
 		};
@@ -752,6 +868,7 @@
 			buildConfigurations = (
 				D68E631C0F0BCF1AB8D56169 /* Debug */,
 				DE5395E82D274BCC4D963AA7 /* Release */,
+				09AC40A0EE10523BD0A00682 /* ReleaseDirect */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -761,6 +878,7 @@
 			buildConfigurations = (
 				31D8A1D201FD10B9158BB382 /* Debug */,
 				678C0E13D4E387314329D471 /* Release */,
+				A7228AD6E0975A198EF6393F /* ReleaseDirect */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -770,6 +888,7 @@
 			buildConfigurations = (
 				FFE1D2F8B6BCF6824D7485A9 /* Debug */,
 				D70EF97C5BD10D637110928C /* Release */,
+				2E8C1B111191DA32ED32668C /* ReleaseDirect */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
