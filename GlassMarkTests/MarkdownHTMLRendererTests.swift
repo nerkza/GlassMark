@@ -160,4 +160,18 @@ final class MarkdownHTMLRendererTests: XCTestCase {
         let html = renderer.renderBody("Just a plain paragraph.")
         XCTAssertFalse(html.contains("footnotes"))
     }
+
+    func testSourceLineAttributesOnlyWhenRequested() {
+        let markdown = "# Heading\n\nParagraph here."
+        XCTAssertFalse(renderer.renderBody(markdown).contains("data-line"))
+
+        let tagged = renderer.renderBody(markdown, withSourceLines: true)
+        XCTAssertTrue(tagged.contains("<h1 data-line=\"0\" id=\"heading\">"))
+        XCTAssertTrue(tagged.contains("<p data-line=\"2\">Paragraph here.</p>"))
+    }
+
+    func testSourceLineOffset() {
+        let tagged = renderer.renderBody("# Heading", withSourceLines: true, lineOffset: 5)
+        XCTAssertTrue(tagged.contains("data-line=\"5\""))
+    }
 }

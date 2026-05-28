@@ -33,8 +33,8 @@ final class CommandStore: ObservableObject {
         outlineScrollRequest = OutlineScrollRequest(characterIndex: characterIndex, headingOrdinal: headingOrdinal)
     }
 
-    func publishScroll(fraction: Double, source: ScrollSource) {
+    func publishScroll(line: Int, source: ScrollSource) {
         scrollSyncToken += 1
-        scrollSync = ScrollSync(token: scrollSyncToken, fraction: fraction, source: source)
+        scrollSync = ScrollSync(token: scrollSyncToken, line: line, source: source)
     }
 }

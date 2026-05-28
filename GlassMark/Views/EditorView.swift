@@ -23,7 +23,7 @@ struct EditorView: View {
                     scrollRequest: scrollRequestBinding,
                     activeLocation: activeLocationBinding,
                     scrollSync: commandStore.scrollSync,
-                    onScroll: { commandStore.publishScroll(fraction: $0, source: .editor) },
+                    onScroll: { commandStore.publishScroll(line: $0, source: .editor) },
                     focusMode: preferencesStore.focusModeEnabled,
                     typewriterMode: preferencesStore.typewriterModeEnabled
                 )
@@ -166,7 +166,7 @@ private struct MarkdownTextView: NSViewRepresentable {
     @Binding var scrollRequest: OutlineScrollRequest?
     @Binding var activeLocation: Int
     let scrollSync: ScrollSync?
-    let onScroll: (Double) -> Void
+    let onScroll: (Int) -> Void
     let focusMode: Bool
     let typewriterMode: Bool
 
@@ -237,7 +237,7 @@ private struct MarkdownTextView: NSViewRepresentable {
         if let scrollSync, scrollSync.source == .preview,
            context.coordinator.lastHandledSyncToken != scrollSync.token {
             context.coordinator.lastHandledSyncToken = scrollSync.token
-            context.coordinator.applyExternalScroll(fraction: scrollSync.fraction)
+            context.coordinator.applyExternalScroll(toLine: scrollSync.line)
         }
 
         if textView.string != text {
@@ -263,7 +263,8 @@ private struct MarkdownTextView: NSViewRepresentable {
     final class Coordinator: NSObject, NSTextViewDelegate {
         var text: Binding<String>
         var activeLocation: Binding<Int>
-        var onScroll: ((Double) -> Void)?
+        var onScroll: ((Int) -> Void)?
+        private var lastPublishedLine = -1
         weak var textView: NSTextView?
         var lastHandledCommandID: UUID?
         var lastHandledScrollID: UUID?
@@ -306,27 +307,45 @@ private struct MarkdownTextView: NSViewRepresentable {
         }
 
         private func publishScrollFraction() {
-            guard let textView,
-                  let scrollView = textView.enclosingScrollView,
-                  let documentView = scrollView.documentView else { return }
-            let clipView = scrollView.contentView
-            let maxY = max(0, documentView.frame.height - clipView.bounds.height)
-            let fraction = maxY > 0 ? clipView.bounds.origin.y / maxY : 0
-            onScroll?(Double(fraction))
+            let line = topVisibleLine()
+            guard line != lastPublishedLine else { return }
+            lastPublishedLine = line
+            onScroll?(line)
         }
 
-        func applyExternalScroll(fraction: Double) {
+        /// Source line (0-based) nearest the top of the editor viewport.
+        private func topVisibleLine() -> Int {
             guard let textView,
-                  let scrollView = textView.enclosingScrollView,
-                  let documentView = scrollView.documentView else { return }
-            let clipView = scrollView.contentView
-            let maxY = max(0, documentView.frame.height - clipView.bounds.height)
+                  let layoutManager = textView.layoutManager,
+                  let textContainer = textView.textContainer else { return 0 }
+            let visibleRect = textView.visibleRect
+            let containerY = max(0, visibleRect.minY - textView.textContainerInset.height + 1)
+            let glyphIndex = layoutManager.glyphIndex(for: NSPoint(x: 0, y: containerY), in: textContainer)
+            let charIndex = layoutManager.characterIndexForGlyph(at: glyphIndex)
+            let nsString = textView.string as NSString
+            let clamped = min(charIndex, nsString.length)
+            return nsString.substring(to: clamped).reduce(0) { $1 == "\n" ? $0 + 1 : $0 }
+        }
+
+        func applyExternalScroll(toLine line: Int) {
             isApplyingExternalScroll = true
-            clipView.setBoundsOrigin(NSPoint(x: 0, y: CGFloat(fraction) * maxY))
-            scrollView.reflectScrolledClipView(clipView)
+            scrollCharacterToTop(characterIndex(forLine: line), margin: 0, moveSelection: false)
             DispatchQueue.main.async { [weak self] in
                 self?.isApplyingExternalScroll = false
             }
+        }
+
+        private func characterIndex(forLine line: Int) -> Int {
+            guard let textView else { return 0 }
+            let nsString = textView.string as NSString
+            var charIndex = 0
+            var current = 0
+            while current < line, charIndex < nsString.length {
+                let range = nsString.lineRange(for: NSRange(location: charIndex, length: 0))
+                charIndex = range.location + range.length
+                current += 1
+            }
+            return min(charIndex, nsString.length)
         }
 
         func textDidChange(_ notification: Notification) {
@@ -579,29 +598,38 @@ private struct MarkdownTextView: NSViewRepresentable {
         // MARK: - Navigation
 
         func scroll(toCharacterIndex index: Int) {
+            scrollCharacterToTop(index, margin: 12, moveSelection: true)
+        }
+
+        private func scrollCharacterToTop(_ index: Int, margin: CGFloat, moveSelection: Bool) {
             guard let textView,
                   let layoutManager = textView.layoutManager,
-                  let textContainer = textView.textContainer else { return }
+                  let textContainer = textView.textContainer,
+                  let scrollView = textView.enclosingScrollView else { return }
 
             let length = (textView.string as NSString).length
             let location = min(max(0, index), length)
-            let selection = NSRange(location: location, length: 0)
 
             layoutManager.ensureLayout(for: textContainer)
 
-            // Use a one-character probe to get the heading line's fragment rect.
-            let probe = NSRange(location: location, length: min(1, max(0, length - location)))
-            let glyphRange = layoutManager.glyphRange(forCharacterRange: probe, actualCharacterRange: nil)
-            let lineRect = layoutManager.lineFragmentRect(forGlyphAt: glyphRange.location, effectiveRange: nil)
-            let targetY = max(0, lineRect.minY + textView.textContainerInset.height - 12)
-
-            if let clipView = textView.enclosingScrollView?.contentView {
-                clipView.setBoundsOrigin(NSPoint(x: 0, y: targetY))
-                textView.enclosingScrollView?.reflectScrolledClipView(clipView)
+            let targetY: CGFloat
+            if length == 0 || layoutManager.numberOfGlyphs == 0 {
+                targetY = 0
+            } else {
+                let probe = NSRange(location: location, length: min(1, max(0, length - location)))
+                let glyphRange = layoutManager.glyphRange(forCharacterRange: probe, actualCharacterRange: nil)
+                let glyph = min(glyphRange.location, layoutManager.numberOfGlyphs - 1)
+                let lineRect = layoutManager.lineFragmentRect(forGlyphAt: glyph, effectiveRange: nil)
+                targetY = max(0, lineRect.minY + textView.textContainerInset.height - margin)
             }
 
-            textView.setSelectedRange(selection)
-            textView.window?.makeFirstResponder(textView)
+            scrollView.contentView.setBoundsOrigin(NSPoint(x: 0, y: targetY))
+            scrollView.reflectScrolledClipView(scrollView.contentView)
+
+            if moveSelection {
+                textView.setSelectedRange(NSRange(location: location, length: 0))
+                textView.window?.makeFirstResponder(textView)
+            }
         }
 
         /// Reports the heading nearest the top of the viewport so the outline can

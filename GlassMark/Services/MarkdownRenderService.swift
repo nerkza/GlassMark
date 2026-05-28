@@ -15,6 +15,17 @@ struct MarkdownRenderService {
         return frontmatterHTML + renderer.renderBody(content)
     }
 
+    /// Like `renderBody` but tags top-level blocks with `data-line` (offset past
+    /// any frontmatter) for line-mapped scroll sync in the preview.
+    func renderPreviewBody(markdown: String) -> String {
+        let (frontmatter, content) = splitFrontmatter(markdown)
+        let frontmatterHTML = frontmatter.map(renderFrontmatter) ?? ""
+        let normalized = markdown.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
+        let contentNormalized = content.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
+        let lineOffset = normalized.components(separatedBy: "\n").count - contentNormalized.components(separatedBy: "\n").count
+        return frontmatterHTML + renderer.renderBody(content, withSourceLines: true, lineOffset: max(0, lineOffset))
+    }
+
     /// Static page loaded once into the preview WebView.
     func documentShell(title: String) -> String {
         """
@@ -129,11 +140,20 @@ struct MarkdownRenderService {
         setTimeout(function () { suppressScroll = false; }, 60);
       });
     }
-    function scrollToFraction(fraction) {
-      suppressScroll = true;
+    function absoluteTop(el) {
       var doc = document.scrollingElement || document.documentElement;
-      var max = doc.scrollHeight - doc.clientHeight;
-      doc.scrollTop = max > 0 ? fraction * max : 0;
+      return el.getBoundingClientRect().top + doc.scrollTop;
+    }
+    function scrollToLine(line) {
+      suppressScroll = true;
+      var els = document.querySelectorAll('[data-line]');
+      var target = null;
+      for (var i = 0; i < els.length; i++) {
+        var l = parseInt(els[i].getAttribute('data-line'), 10);
+        if (l <= line) { target = els[i]; } else { break; }
+      }
+      var doc = document.scrollingElement || document.documentElement;
+      doc.scrollTop = target ? Math.max(0, absoluteTop(target) - 8) : 0;
       setTimeout(function () { suppressScroll = false; }, 90);
     }
     function scrollToHeading(ordinal) {
@@ -149,10 +169,16 @@ struct MarkdownRenderService {
     window.addEventListener('scroll', function () {
       if (suppressScroll) return;
       var doc = document.scrollingElement || document.documentElement;
-      var max = doc.scrollHeight - doc.clientHeight;
-      var fraction = max > 0 ? doc.scrollTop / max : 0;
+      var top = doc.scrollTop;
+      var els = document.querySelectorAll('[data-line]');
+      var line = 0;
+      for (var i = 0; i < els.length; i++) {
+        if (absoluteTop(els[i]) <= top + 1) {
+          line = parseInt(els[i].getAttribute('data-line'), 10);
+        } else { break; }
+      }
       if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.glassmarkScroll) {
-        window.webkit.messageHandlers.glassmarkScroll.postMessage(fraction);
+        window.webkit.messageHandlers.glassmarkScroll.postMessage(line);
       }
     }, { passive: true });
     """

@@ -39,9 +39,10 @@ enum ScrollSource: Equatable {
     case preview
 }
 
-/// A proportional scroll position shared between the editor and preview panes.
+/// A source-line scroll position shared between the editor and preview panes for
+/// line-mapped sync.
 struct ScrollSync: Equatable {
     let token: Int
-    let fraction: Double
+    let line: Int
     let source: ScrollSource
 }

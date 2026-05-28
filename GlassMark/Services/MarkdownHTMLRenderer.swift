@@ -6,13 +6,13 @@ import Foundation
 /// document can be previewed without loading remote scripts or markup. It is a
 /// pure value type with no I/O, which keeps it fast and unit-testable.
 struct MarkdownHTMLRenderer {
-    func renderBody(_ markdown: String) -> String {
+    func renderBody(_ markdown: String, withSourceLines: Bool = false, lineOffset: Int = 0) -> String {
         let normalized = markdown.replacingOccurrences(of: "\r\n", with: "\n")
             .replacingOccurrences(of: "\r", with: "\n")
         let lines = normalized.components(separatedBy: "\n")
 
         let footnotes = collectFootnotes(lines)
-        var html = renderBlocks(lines)
+        var html = renderBlocks(lines, topLevel: true, withSourceLines: withSourceLines, lineOffset: lineOffset)
 
         // Replace inline footnote references with numbered superscript links.
         for (index, footnote) in footnotes.enumerated() {
@@ -65,12 +65,21 @@ struct MarkdownHTMLRenderer {
 
     // MARK: - Block parsing
 
-    private func renderBlocks(_ lines: [String]) -> String {
+    private func renderBlocks(_ lines: [String], topLevel: Bool = false, withSourceLines: Bool = false, lineOffset: Int = 0) -> String {
         var html: [String] = []
         var index = 0
 
+        func emit(_ block: String, at line: Int) {
+            if topLevel && withSourceLines {
+                html.append(injectDataLine(block, line: line + lineOffset))
+            } else {
+                html.append(block)
+            }
+        }
+
         while index < lines.count {
             let line = lines[index]
+            let startLine = index
 
             if line.trimmingCharacters(in: .whitespaces).isEmpty {
                 index += 1
@@ -84,26 +93,26 @@ struct MarkdownHTMLRenderer {
 
             if let fence = fenceMarker(line) {
                 let (block, next) = consumeFencedCode(lines, start: index, fence: fence)
-                html.append(block)
+                emit(block, at: startLine)
                 index = next
                 continue
             }
 
             if isHorizontalRule(line) {
-                html.append("<hr>")
+                emit("<hr>", at: startLine)
                 index += 1
                 continue
             }
 
             if let heading = atxHeading(line) {
-                html.append(heading)
+                emit(heading, at: startLine)
                 index += 1
                 continue
             }
 
             if line.drop(while: { $0 == " " }).first == ">" {
                 let (block, next) = consumeBlockquote(lines, start: index)
-                html.append(block)
+                emit(block, at: startLine)
                 index = next
                 continue
             }
@@ -112,24 +121,36 @@ struct MarkdownHTMLRenderer {
                line.contains("|"),
                isTableDelimiterRow(lines[index + 1]) {
                 let (block, next) = consumeTable(lines, start: index)
-                html.append(block)
+                emit(block, at: startLine)
                 index = next
                 continue
             }
 
             if listItem(line) != nil {
                 let end = listBlockEnd(lines, start: index)
-                html.append(renderList(Array(lines[index..<end])))
+                emit(renderList(Array(lines[index..<end])), at: startLine)
                 index = end
                 continue
             }
 
             let (block, next) = consumeParagraph(lines, start: index)
-            html.append(block)
+            emit(block, at: startLine)
             index = next
         }
 
         return html.joined(separator: "\n")
+    }
+
+    /// Inserts a `data-line` attribute into a block's opening tag so the preview
+    /// can be scroll-synced to the editor's source lines.
+    private func injectDataLine(_ html: String, line: Int) -> String {
+        guard html.hasPrefix("<") else { return html }
+        let chars = Array(html)
+        var cursor = 1
+        while cursor < chars.count, chars[cursor].isLetter || chars[cursor].isNumber {
+            cursor += 1
+        }
+        return String(chars[0..<cursor]) + " data-line=\"\(line)\"" + String(chars[cursor...])
     }
 
     // MARK: - Fenced code

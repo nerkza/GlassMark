@@ -18,7 +18,7 @@ struct PreviewView: View {
                 themeCSS: renderService.themeCSS(preferencesStore.previewTheme, customCSS: preferencesStore.customPreviewCSS),
                 scrollRequest: commandStore.outlineScrollRequest,
                 scrollSync: commandStore.scrollSync,
-                onScroll: { commandStore.publishScroll(fraction: $0, source: .preview) }
+                onScroll: { commandStore.publishScroll(line: $0, source: .preview) }
             )
         } else {
             ContentUnavailableView("Nothing to Preview", systemImage: "doc.text.magnifyingglass")
@@ -36,7 +36,7 @@ private struct WebPreview: NSViewRepresentable {
     let themeCSS: String
     let scrollRequest: OutlineScrollRequest?
     let scrollSync: ScrollSync?
-    let onScroll: (Double) -> Void
+    let onScroll: (Int) -> Void
 
     private let renderService = MarkdownRenderService()
 
@@ -72,7 +72,7 @@ private struct WebPreview: NSViewRepresentable {
     @MainActor
     final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         weak var webView: WKWebView?
-        var onScroll: ((Double) -> Void)?
+        var onScroll: ((Int) -> Void)?
         private let renderService: MarkdownRenderService
         private var isShellLoaded = false
         private var pendingMarkdown: String?
@@ -114,7 +114,7 @@ private struct WebPreview: NSViewRepresentable {
         func handleScrollSync(_ sync: ScrollSync?) {
             guard let sync, sync.source == .editor, lastHandledSyncToken != sync.token else { return }
             lastHandledSyncToken = sync.token
-            webView?.evaluateJavaScript("scrollToFraction(\(sync.fraction));", completionHandler: nil)
+            webView?.evaluateJavaScript("scrollToLine(\(sync.line));", completionHandler: nil)
         }
 
         nonisolated func userContentController(
@@ -123,8 +123,8 @@ private struct WebPreview: NSViewRepresentable {
         ) {
             // Script messages are always delivered on the main thread.
             MainActor.assumeIsolated {
-                guard let fraction = (message.body as? NSNumber)?.doubleValue else { return }
-                onScroll?(fraction)
+                guard let line = (message.body as? NSNumber)?.intValue else { return }
+                onScroll?(line)
             }
         }
 
@@ -137,7 +137,7 @@ private struct WebPreview: NSViewRepresentable {
                 guard let self else { return }
                 let service = self.renderService
                 DispatchQueue.global(qos: .userInitiated).async {
-                    let body = service.renderBody(markdown: markdown)
+                    let body = service.renderPreviewBody(markdown: markdown)
                     DispatchQueue.main.async {
                         self.apply(body: body)
                     }

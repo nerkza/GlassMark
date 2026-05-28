@@ -53,6 +53,14 @@ final class MarkdownRenderServiceTests: XCTestCase {
         XCTAssertTrue(shell.contains("function setTheme"))
     }
 
+    func testPreviewBodyTagsLinesPastFrontmatter() {
+        let markdown = "---\ntitle: Doc\n---\n# Heading"
+        let body = service.renderPreviewBody(markdown: markdown)
+        // Frontmatter occupies lines 0-2, so the heading is source line 3.
+        XCTAssertTrue(body.contains("data-line=\"3\""))
+        XCTAssertTrue(body.contains("frontmatter"))
+    }
+
     func testThemeCSSComposition() {
         XCTAssertEqual(service.themeCSS(.system, customCSS: ""), "")
         XCTAssertTrue(service.themeCSS(.sepia, customCSS: "").contains("f4ecd8"))
