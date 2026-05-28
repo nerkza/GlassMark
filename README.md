@@ -7,9 +7,13 @@ It is a calm, local, folder-based writing surface — not a publishing platform,
 ## Features
 
 - **Live preview** that updates as you type, with smooth, flicker-free rendering and preserved scroll position.
-- **Synced scrolling** between the editor and preview in split mode, in both directions.
-- **GitHub-flavored Markdown** rendering: headings, bold/italic/strikethrough, links, images, fenced code blocks, blockquotes, nested lists, task lists, tables, and autolinks — all rendered with a clean, GitHub-style stylesheet that adapts to light and dark mode.
+- **Line-mapped synced scrolling** between the editor and preview in split mode, in both directions.
+- **GitHub-flavored Markdown** rendering: headings, bold/italic/strikethrough, links, images, fenced code blocks, blockquotes, nested lists, task lists, tables, autolinks, and footnotes — all rendered with a clean, GitHub-style stylesheet that adapts to light and dark mode.
+- **Syntax-highlighted code blocks** (highlight.js), **math** (`$…$` / `$$…$$` via KaTeX), and **diagrams** (```mermaid fences) — all rendered offline; nothing is fetched from the network.
+- **Preview themes** (System, Sepia, High Contrast, Dark) plus your own custom CSS.
 - **In-editor syntax highlighting** for headings, emphasis, code, links, blockquotes, and list markers.
+- **Calm-writing modes**: focus mode (dims all but the current paragraph) and typewriter scrolling.
+- **Smart typing**: auto-pairing of brackets/backticks, selection wrapping, automatic list continuation, and Tab/Shift-Tab navigation between table cells.
 - **Editor / Split / Preview** view modes.
 - **Outline panel** that lists document headings and jumps the editor to any of them.
 - **Smart editing**: bold/italic/link keyboard shortcuts, a formatting toolbar, automatic list continuation, and a formatting menu.
@@ -35,6 +39,8 @@ Markdown is rendered entirely natively with no third-party dependencies, and the
 | Save | `⌘S` |
 | Refresh workspace | `⌘R` |
 | Toggle outline | `⌥⌘0` |
+| Focus mode | `⌃⌘F` |
+| Export as HTML / PDF | File menu |
 | Bold / Italic / Inline code | `⌘B` / `⌘I` / `⌘E` |
 | Strikethrough | `⇧⌘X` |
 | Insert link | `⌘K` |
