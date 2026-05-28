@@ -22,6 +22,17 @@ final class WorkspaceFileTests: XCTestCase {
         XCTAssertFalse(WorkspaceFile(url: root.appendingPathComponent("a.md"), rootURL: root, kind: .markdown).isDirectory)
     }
 
+    func testWorkspaceDecodesLenidentlyWithoutAdditiveFields() throws {
+        // A blob saved by an older build that predates isPinned / colorName.
+        let json = """
+        {"id":"\(UUID().uuidString)","displayName":"Legacy","rootURL":"file:///tmp/legacy","bookmarkData":"","lastOpenedAt":0}
+        """.data(using: .utf8)!
+        let workspace = try JSONDecoder().decode(Workspace.self, from: json)
+        XCTAssertEqual(workspace.displayName, "Legacy")
+        XCTAssertFalse(workspace.isPinned)
+        XCTAssertTrue(WorkspaceColorName.allCases.contains(workspace.colorName))
+    }
+
     func testFileTypeDetection() {
         XCTAssertEqual(FileType(url: URL(fileURLWithPath: "/x/a.md"))?.workspaceKind, .markdown)
         XCTAssertEqual(FileType(url: URL(fileURLWithPath: "/x/a.markdown"))?.workspaceKind, .markdown)

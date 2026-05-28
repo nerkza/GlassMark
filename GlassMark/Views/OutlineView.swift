@@ -32,7 +32,6 @@ struct OutlineView: View {
                 }
             }
         }
-        .navigationTitle("Outline")
     }
 
     private func row(for item: MarkdownOutlineItem, ordinal: Int, isActive: Bool) -> some View {

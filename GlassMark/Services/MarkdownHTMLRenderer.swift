@@ -117,6 +117,25 @@ struct MarkdownHTMLRenderer {
                 continue
             }
 
+            // Display math: a `$$` line, its content, and a closing `$$` line.
+            // Emit as a single element (no <br>) so KaTeX can match the delimiters.
+            if line.trimmingCharacters(in: .whitespaces) == "$$" {
+                var mathLines: [String] = []
+                var cursor = index + 1
+                var closed = false
+                while cursor < lines.count {
+                    if lines[cursor].trimmingCharacters(in: .whitespaces) == "$$" { closed = true; break }
+                    mathLines.append(lines[cursor])
+                    cursor += 1
+                }
+                if closed {
+                    let inner = escapeHTML(mathLines.joined(separator: "\n"))
+                    emit("<p class=\"math-display\">$$\n\(inner)\n$$</p>", at: startLine)
+                    index = cursor + 1
+                    continue
+                }
+            }
+
             if index + 1 < lines.count,
                line.contains("|"),
                isTableDelimiterRow(lines[index + 1]) {

@@ -148,6 +148,7 @@ private struct DetailWorkspaceView: View {
                 }
             }
         }
+        .navigationTitle(documentStore.document?.file.name ?? workspaceStore.activeWorkspace?.displayName ?? "Glassmark")
     }
 }
 

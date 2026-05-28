@@ -170,6 +170,13 @@ final class MarkdownHTMLRendererTests: XCTestCase {
         XCTAssertTrue(tagged.contains("<p data-line=\"2\">Paragraph here.</p>"))
     }
 
+    func testDisplayMathBlockIsSingleElement() {
+        let html = renderer.renderBody("$$\n\\int_0^1 x\\,dx = \\tfrac12\n$$")
+        XCTAssertTrue(html.contains("<p class=\"math-display\">$$"))
+        XCTAssertFalse(html.contains("<br>"), "Display math must not be split by hard line breaks")
+        XCTAssertTrue(html.contains("\\int_0^1"))
+    }
+
     func testSourceLineOffset() {
         let tagged = renderer.renderBody("# Heading", withSourceLines: true, lineOffset: 5)
         XCTAssertTrue(tagged.contains("data-line=\"5\""))
