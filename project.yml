@@ -46,6 +46,7 @@ targets:
         CFBundleVersion: "1"
         LSMinimumSystemVersion: "15.0"
         NSPrincipalClass: NSApplication
+        ITSAppUsesNonExemptEncryption: false
   GlassMarkTests:
     type: bundle.unit-test
     platform: macOS
