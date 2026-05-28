@@ -1,0 +1,61 @@
+{
+  "fill" : "system-dark",
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "fill" : {
+            "solid" : "display-p3:0.57352,0.57914,0.57914,1.00000"
+          },
+          "image-name" : "Image.png",
+          "name" : "Image",
+          "position" : {
+            "scale" : 3,
+            "translation-in-points" : [
+              -236.80577868205046,
+              -279.31617762064707
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "image-name" : "glassmark-icon-transparent.png",
+          "name" : "glassmark-icon-transparent",
+          "position" : {
+            "scale" : 1.2,
+            "translation-in-points" : [
+              0,
+              0.6000000000001364
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

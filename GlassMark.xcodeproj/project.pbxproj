@@ -35,6 +35,7 @@
 		5EC581F205A9CC73E8B5CE1A /* DocumentStatisticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDB7AADBF5223AE29CD871EF /* DocumentStatisticsTests.swift */; };
 		5FC146A64A1869CFD0E840D3 /* WorkspaceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4237CCF9896FAF189B6474 /* WorkspaceStore.swift */; };
 		65ECB6D61B19BFE12843D0C1 /* MarkdownSyntaxHighlighterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7CB20F34B385B7863B111E /* MarkdownSyntaxHighlighterTests.swift */; };
+		679D69C745BAA88E331EA805 /* glassmark-iconset.icon in Resources */ = {isa = PBXBuildFile; fileRef = 55AB95D7E289ADD620F995DD /* glassmark-iconset.icon */; };
 		683F879782B5CFACAA904D26 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5075C486E588D899B4EBCDB5 /* PreviewView.swift */; };
 		6A57B4F1E1819AE891D6B768 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DDFAD0FBF3A416CA3E96A2 /* ContentView.swift */; };
 		704C0917F616B1EE4DA3C06C /* KaTeX_Typewriter-Regular.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 64A0CCD3610A29544C5812FF /* KaTeX_Typewriter-Regular.woff2 */; };
@@ -110,6 +111,7 @@
 		5075C486E588D899B4EBCDB5 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
 		513BB2C2365691A8818DEBCC /* GlassMark.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GlassMark.entitlements; sourceTree = "<group>"; };
 		5530453C4C88258760ADB5A9 /* mermaid.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = mermaid.min.js; sourceTree = "<group>"; };
+		55AB95D7E289ADD620F995DD /* glassmark-iconset.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = "glassmark-iconset.icon"; sourceTree = "<group>"; };
 		579A963ABA6FC838ED69E19E /* KaTeX_Math-BoldItalic.woff2 */ = {isa = PBXFileReference; path = "KaTeX_Math-BoldItalic.woff2"; sourceTree = "<group>"; };
 		5B7CB20F34B385B7863B111E /* MarkdownSyntaxHighlighterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownSyntaxHighlighterTests.swift; sourceTree = "<group>"; };
 		5FE830B916B2ADC183CC6CAF /* GlassMarkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassMarkApp.swift; sourceTree = "<group>"; };
@@ -323,6 +325,7 @@
 		B01B816AFE14A87AF726CF2D /* GlassMark */ = {
 			isa = PBXGroup;
 			children = (
+				55AB95D7E289ADD620F995DD /* glassmark-iconset.icon */,
 				513BB2C2365691A8818DEBCC /* GlassMark.entitlements */,
 				A3AF83CBDBD6BDC9624B662F /* App */,
 				6F2A1448B77A174097FF96C5 /* Models */,
@@ -463,6 +466,7 @@
 				D1484A0B6350E0E2B888CB6E /* auto-render.min.js in Resources */,
 				9124CD1C34000B3E047DE834 /* github-dark.min.css in Resources */,
 				95A488B9DBCE77A1CB86C0E6 /* github.min.css in Resources */,
+				679D69C745BAA88E331EA805 /* glassmark-iconset.icon in Resources */,
 				A26F3BAE8DC4FCEC7C0A05FE /* highlight.min.js in Resources */,
 				406FB1C54A686ECFD5C46DDF /* katex.min.css in Resources */,
 				50C939EBF9DF861FEBBB2BC6 /* katex.min.js in Resources */,
@@ -639,7 +643,7 @@
 		D70EF97C5BD10D637110928C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "glassmark-iconset";
 				CODE_SIGN_ENTITLEMENTS = GlassMark/GlassMark.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -718,7 +722,7 @@
 		FFE1D2F8B6BCF6824D7485A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "glassmark-iconset";
 				CODE_SIGN_ENTITLEMENTS = GlassMark/GlassMark.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;

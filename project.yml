@@ -16,6 +16,10 @@ targets:
     platform: macOS
     sources:
       - path: GlassMark
+        excludes:
+          - "glassmark-iconset.icon"
+      - path: GlassMark/glassmark-iconset.icon
+        type: file
     entitlements:
       path: GlassMark/GlassMark.entitlements
     settings:
@@ -25,7 +29,7 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: GlassMark
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
         INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 GlassMark. Released under the MIT License."
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_APPICON_NAME: glassmark-iconset
         ENABLE_HARDENED_RUNTIME: true
         CODE_SIGN_STYLE: Automatic
     info:
