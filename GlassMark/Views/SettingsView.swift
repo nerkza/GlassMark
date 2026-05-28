@@ -18,9 +18,8 @@ struct SettingsView: View {
             }
 
             Toggle("Autosave", isOn: $preferencesStore.autosaveEnabled)
-                .disabled(true)
 
-            Text("Autosave is intentionally disabled for the first build slice.")
+            Text("When on, edits are written to disk automatically a moment after you stop typing. Manual save (⌘S) is always available.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

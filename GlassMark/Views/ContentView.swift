@@ -13,46 +13,10 @@ struct ContentView: View {
         } detail: {
             DetailWorkspaceView()
         }
-        .toolbar {
-            ToolbarItemGroup {
-                Button {
-                    guard let file = workspaceStore.createMarkdownFile(),
-                          let workspace = workspaceStore.activeWorkspace else { return }
-
-                    documentStore.open(file, workspace: workspace)
-                } label: {
-                    Label("New Markdown File", systemImage: "doc.badge.plus")
-                }
-                .disabled(workspaceStore.activeWorkspace == nil)
-
-                Button {
-                    workspaceStore.refreshFileTree()
-                } label: {
-                    Label("Refresh Workspace", systemImage: "arrow.clockwise")
-                }
-                .disabled(workspaceStore.activeWorkspace == nil)
-
-                Button {
-                    commandStore.presentQuickOpen()
-                } label: {
-                    Label("Quick Open", systemImage: "magnifyingglass")
-                }
-                .help("Quick Open (⌘P)")
-                .disabled(workspaceStore.activeWorkspace == nil)
-
-                Picker("View Mode", selection: $preferencesStore.viewMode) {
-                    ForEach(ViewMode.allCases) { mode in
-                        Text(mode.title).tag(mode)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .frame(width: 220)
-
-                Button("Save") {
-                    documentStore.save()
-                }
-                .disabled(!documentStore.canSave)
-            }
+        .toolbar { toolbarContent }
+        .inspector(isPresented: $commandStore.isOutlineVisible) {
+            OutlineView()
+                .inspectorColumnWidth(min: 200, ideal: 240, max: 360)
         }
         .alert("Workspace Error", isPresented: workspaceErrorBinding) {
             Button("OK", role: .cancel) {}
@@ -66,12 +30,74 @@ struct ContentView: View {
         }
         .onChange(of: workspaceStore.activeWorkspace?.id) {
             documentStore.activate(workspace: workspaceStore.activeWorkspace)
+            if let workspace = workspaceStore.activeWorkspace {
+                documentStore.restoreSession(for: workspace)
+            }
+        }
+        .onAppear {
+            documentStore.autosaveEnabled = preferencesStore.autosaveEnabled
+            if let workspace = workspaceStore.activeWorkspace {
+                documentStore.restoreSession(for: workspace)
+            }
+        }
+        .onChange(of: preferencesStore.autosaveEnabled) {
+            documentStore.autosaveEnabled = preferencesStore.autosaveEnabled
         }
         .sheet(isPresented: $commandStore.isQuickOpenPresented) {
             QuickOpenView(files: workspaceStore.fileTree) { file in
                 guard let workspace = workspaceStore.activeWorkspace else { return }
                 documentStore.open(file, workspace: workspace)
             }
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItemGroup {
+            Button {
+                guard let file = workspaceStore.createMarkdownFile(),
+                      let workspace = workspaceStore.activeWorkspace else { return }
+                documentStore.open(file, workspace: workspace)
+            } label: {
+                Label("New Markdown File", systemImage: "doc.badge.plus")
+            }
+            .disabled(workspaceStore.activeWorkspace == nil)
+
+            Button {
+                workspaceStore.refreshFileTree()
+            } label: {
+                Label("Refresh Workspace", systemImage: "arrow.clockwise")
+            }
+            .disabled(workspaceStore.activeWorkspace == nil)
+
+            Button {
+                commandStore.presentQuickOpen()
+            } label: {
+                Label("Quick Open", systemImage: "magnifyingglass")
+            }
+            .help("Quick Open (⌘P)")
+            .disabled(workspaceStore.activeWorkspace == nil)
+
+            Picker("View Mode", selection: $preferencesStore.viewMode) {
+                ForEach(ViewMode.allCases) { mode in
+                    Text(mode.title).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            .frame(width: 220)
+
+            Button {
+                commandStore.toggleOutline()
+            } label: {
+                Label("Outline", systemImage: "list.bullet.indent")
+            }
+            .help("Toggle Outline")
+            .disabled(documentStore.document == nil)
+
+            Button("Save") {
+                documentStore.save()
+            }
+            .disabled(!documentStore.canSave)
         }
     }
 
