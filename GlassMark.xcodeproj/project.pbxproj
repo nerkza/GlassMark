@@ -553,7 +553,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.glassmark.GlassMarkTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.recurse.glassmark.tests;
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Glassmark.app/Contents/MacOS/Glassmark";
 			};
@@ -570,7 +570,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.glassmark.GlassMarkTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.recurse.glassmark.tests;
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Glassmark.app/Contents/MacOS/Glassmark";
 			};
@@ -656,7 +656,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.glassmark.GlassMark;
+				PRODUCT_BUNDLE_IDENTIFIER = com.recurse.glassmark;
 				PRODUCT_MODULE_NAME = GlassMark;
 				PRODUCT_NAME = Glassmark;
 				SDKROOT = macosx;
@@ -736,7 +736,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.glassmark.GlassMark;
+				PRODUCT_BUNDLE_IDENTIFIER = com.recurse.glassmark;
 				PRODUCT_MODULE_NAME = GlassMark;
 				PRODUCT_NAME = Glassmark;
 				SDKROOT = macosx;

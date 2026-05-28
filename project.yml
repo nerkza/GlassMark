@@ -22,9 +22,14 @@ targets:
         type: file
     entitlements:
       path: GlassMark/GlassMark.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        com.apple.security.files.user-selected.read-write: true
+        com.apple.security.files.bookmarks.app-scope: true
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.glassmark.GlassMark
+        PRODUCT_BUNDLE_IDENTIFIER: com.recurse.glassmark
         PRODUCT_NAME: Glassmark
         PRODUCT_MODULE_NAME: GlassMark
         INFOPLIST_KEY_CFBundleDisplayName: Glassmark
@@ -50,7 +55,7 @@ targets:
       - target: GlassMark
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.glassmark.GlassMarkTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.recurse.glassmark.tests
         GENERATE_INFOPLIST_FILE: true
         # The host product is Glassmark.app (PRODUCT_NAME), not the target name.
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Glassmark.app/Contents/MacOS/Glassmark"
