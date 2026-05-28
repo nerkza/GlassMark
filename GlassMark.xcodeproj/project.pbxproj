@@ -647,6 +647,7 @@
 				CODE_SIGN_ENTITLEMENTS = GlassMark/GlassMark.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = R57FJUULSB;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = GlassMark/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Glassmark;

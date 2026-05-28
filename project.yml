@@ -38,6 +38,12 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: glassmark-iconset
         ENABLE_HARDENED_RUNTIME: true
         CODE_SIGN_STYLE: Automatic
+      configs:
+        # Preselect the Recurse LTD team for App Store archiving. Release-only so
+        # local Debug/test builds keep signing ad-hoc (there's no Recurse LTD
+        # development cert on the machine, only the distribution one).
+        Release:
+          DEVELOPMENT_TEAM: R57FJUULSB
     info:
       path: GlassMark/Resources/Info.plist
       properties:
