@@ -19,7 +19,8 @@ struct EditorView: View {
                         set: { documentStore.updateText($0) }
                     ),
                     pendingCommand: pendingCommandBinding,
-                    scrollRequest: scrollRequestBinding
+                    scrollRequest: scrollRequestBinding,
+                    activeLocation: activeLocationBinding
                 )
             }
 
@@ -40,6 +41,13 @@ struct EditorView: View {
         Binding(
             get: { commandStore.outlineScrollRequest },
             set: { commandStore.outlineScrollRequest = $0 }
+        )
+    }
+
+    private var activeLocationBinding: Binding<Int> {
+        Binding(
+            get: { commandStore.activeOutlineCharacterIndex },
+            set: { commandStore.activeOutlineCharacterIndex = $0 }
         )
     }
 }
@@ -151,9 +159,10 @@ private struct MarkdownTextView: NSViewRepresentable {
     @Binding var text: String
     @Binding var pendingCommand: EditorCommandRequest?
     @Binding var scrollRequest: OutlineScrollRequest?
+    @Binding var activeLocation: Int
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(text: $text)
+        Coordinator(text: $text, activeLocation: $activeLocation)
     }
 
     func makeNSView(context: Context) -> NSScrollView {
@@ -195,6 +204,7 @@ private struct MarkdownTextView: NSViewRepresentable {
         textView.string = text
         scrollView.documentView = textView
         context.coordinator.textView = textView
+        context.coordinator.observeScrolling(of: scrollView)
         context.coordinator.applyHighlighting()
         return scrollView
     }
@@ -203,6 +213,7 @@ private struct MarkdownTextView: NSViewRepresentable {
         guard let textView = scrollView.documentView as? NSTextView else { return }
 
         context.coordinator.text = $text
+        context.coordinator.activeLocation = $activeLocation
 
         if textView.string != text {
             let selectedRanges = textView.selectedRanges
@@ -220,28 +231,55 @@ private struct MarkdownTextView: NSViewRepresentable {
         if let scrollRequest, context.coordinator.lastHandledScrollID != scrollRequest.id {
             context.coordinator.lastHandledScrollID = scrollRequest.id
             context.coordinator.scroll(toCharacterIndex: scrollRequest.characterIndex)
-            DispatchQueue.main.async { self.scrollRequest = nil }
         }
     }
 
     @MainActor
     final class Coordinator: NSObject, NSTextViewDelegate {
         var text: Binding<String>
+        var activeLocation: Binding<Int>
         weak var textView: NSTextView?
         var lastHandledCommandID: UUID?
         var lastHandledScrollID: UUID?
 
         private let highlighter = MarkdownSyntaxHighlighter()
         private let baseFont = NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        private var isObservingScrolling = false
 
-        init(text: Binding<String>) {
+        init(text: Binding<String>, activeLocation: Binding<Int>) {
             self.text = text
+            self.activeLocation = activeLocation
+        }
+
+        deinit {
+            NotificationCenter.default.removeObserver(self)
+        }
+
+        func observeScrolling(of scrollView: NSScrollView) {
+            guard !isObservingScrolling else { return }
+            isObservingScrolling = true
+            let clipView = scrollView.contentView
+            clipView.postsBoundsChangedNotifications = true
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleBoundsChange),
+                name: NSView.boundsDidChangeNotification,
+                object: clipView
+            )
+        }
+
+        @objc private func handleBoundsChange() {
+            updateActiveLocation()
         }
 
         func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView else { return }
             text.wrappedValue = textView.string
             applyHighlighting()
+        }
+
+        func textViewDidChangeSelection(_ notification: Notification) {
+            updateActiveLocation()
         }
 
         // MARK: - List continuation
@@ -381,13 +419,47 @@ private struct MarkdownTextView: NSViewRepresentable {
         // MARK: - Navigation
 
         func scroll(toCharacterIndex index: Int) {
-            guard let textView else { return }
+            guard let textView,
+                  let layoutManager = textView.layoutManager,
+                  let textContainer = textView.textContainer else { return }
+
             let length = (textView.string as NSString).length
-            guard index <= length else { return }
-            let range = NSRange(location: index, length: 0)
-            textView.scrollRangeToVisible(range)
-            textView.setSelectedRange(range)
+            let location = min(max(0, index), length)
+            let selection = NSRange(location: location, length: 0)
+
+            layoutManager.ensureLayout(for: textContainer)
+
+            // Use a one-character probe to get the heading line's fragment rect.
+            let probe = NSRange(location: location, length: min(1, max(0, length - location)))
+            let glyphRange = layoutManager.glyphRange(forCharacterRange: probe, actualCharacterRange: nil)
+            let lineRect = layoutManager.lineFragmentRect(forGlyphAt: glyphRange.location, effectiveRange: nil)
+            let targetY = max(0, lineRect.minY + textView.textContainerInset.height - 12)
+
+            if let clipView = textView.enclosingScrollView?.contentView {
+                clipView.setBoundsOrigin(NSPoint(x: 0, y: targetY))
+                textView.enclosingScrollView?.reflectScrolledClipView(clipView)
+            }
+
+            textView.setSelectedRange(selection)
             textView.window?.makeFirstResponder(textView)
+        }
+
+        /// Reports the heading nearest the top of the viewport so the outline can
+        /// highlight the active section.
+        func updateActiveLocation() {
+            guard let textView,
+                  let layoutManager = textView.layoutManager,
+                  let textContainer = textView.textContainer else { return }
+
+            let visibleRect = textView.visibleRect
+            let containerY = max(0, visibleRect.minY - textView.textContainerInset.height + 1)
+            let point = NSPoint(x: 0, y: containerY)
+            let glyphIndex = layoutManager.glyphIndex(for: point, in: textContainer)
+            let characterIndex = layoutManager.characterIndexForGlyph(at: glyphIndex)
+
+            guard activeLocation.wrappedValue != characterIndex else { return }
+            let binding = activeLocation
+            DispatchQueue.main.async { binding.wrappedValue = characterIndex }
         }
 
         // MARK: - Highlighting

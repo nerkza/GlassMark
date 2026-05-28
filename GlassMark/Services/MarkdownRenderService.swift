@@ -125,6 +125,12 @@ struct MarkdownRenderService {
       var max = doc.scrollHeight - doc.clientHeight;
       doc.scrollTop = fraction * max;
     }
+    function scrollToHeading(ordinal) {
+      var headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      if (ordinal >= 0 && ordinal < headings.length) {
+        headings[ordinal].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
     """
 
     static let css = """

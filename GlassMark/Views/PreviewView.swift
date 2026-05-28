@@ -4,13 +4,15 @@ import WebKit
 
 struct PreviewView: View {
     @EnvironmentObject private var documentStore: DocumentStore
+    @EnvironmentObject private var commandStore: CommandStore
 
     var body: some View {
         if let document = documentStore.document {
             WebPreview(
                 markdown: document.text,
                 title: document.file.name,
-                baseURL: document.file.url.deletingLastPathComponent()
+                baseURL: document.file.url.deletingLastPathComponent(),
+                scrollRequest: commandStore.outlineScrollRequest
             )
         } else {
             ContentUnavailableView("Nothing to Preview", systemImage: "doc.text.magnifyingglass")
@@ -25,6 +27,7 @@ private struct WebPreview: NSViewRepresentable {
     let markdown: String
     let title: String
     let baseURL: URL
+    let scrollRequest: OutlineScrollRequest?
 
     private let renderService = MarkdownRenderService()
 
@@ -48,6 +51,7 @@ private struct WebPreview: NSViewRepresentable {
 
     func updateNSView(_ webView: WKWebView, context: Context) {
         context.coordinator.scheduleRender(markdown: markdown)
+        context.coordinator.handleScroll(request: scrollRequest)
     }
 
     @MainActor
@@ -58,9 +62,20 @@ private struct WebPreview: NSViewRepresentable {
         private var pendingMarkdown: String?
         private var latestMarkdown: String = ""
         private var renderWorkItem: DispatchWorkItem?
+        private var lastHandledScrollID: UUID?
 
         init(renderService: MarkdownRenderService) {
             self.renderService = renderService
+        }
+
+        func handleScroll(request: OutlineScrollRequest?) {
+            guard let request, lastHandledScrollID != request.id else { return }
+            lastHandledScrollID = request.id
+            let ordinal = request.headingOrdinal
+            // Defer slightly so any pending content update is applied first.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+                self?.webView?.evaluateJavaScript("scrollToHeading(\(ordinal));", completionHandler: nil)
+            }
         }
 
         func scheduleRender(markdown: String) {

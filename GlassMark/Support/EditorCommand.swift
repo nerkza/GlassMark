@@ -23,8 +23,11 @@ struct EditorCommandRequest: Identifiable, Equatable {
     let command: EditorCommand
 }
 
-/// Request to scroll the editor to a heading selected in the outline.
+/// Request to scroll the editor and preview to a heading selected in the outline.
 struct OutlineScrollRequest: Identifiable, Equatable {
     let id = UUID()
+    /// UTF-16 offset of the heading in the source text (used by the editor).
     let characterIndex: Int
+    /// Position of the heading among all document headings (used by the preview).
+    let headingOrdinal: Int
 }
