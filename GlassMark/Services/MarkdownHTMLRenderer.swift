@@ -10,7 +10,57 @@ struct MarkdownHTMLRenderer {
         let normalized = markdown.replacingOccurrences(of: "\r\n", with: "\n")
             .replacingOccurrences(of: "\r", with: "\n")
         let lines = normalized.components(separatedBy: "\n")
-        return renderBlocks(lines)
+
+        let footnotes = collectFootnotes(lines)
+        var html = renderBlocks(lines)
+
+        // Replace inline footnote references with numbered superscript links.
+        for (index, footnote) in footnotes.enumerated() {
+            let number = index + 1
+            let anchor = escapeAttribute(footnote.id)
+            let reference = "<sup class=\"footnote-ref\"><a href=\"#fn-\(anchor)\" id=\"fnref-\(anchor)\">\(number)</a></sup>"
+            html = html.replacingOccurrences(of: "[^\(footnote.id)]", with: reference)
+        }
+
+        if !footnotes.isEmpty {
+            html += footnotesSection(footnotes)
+        }
+
+        return html
+    }
+
+    // MARK: - Footnotes
+
+    private struct Footnote {
+        let id: String
+        let html: String
+    }
+
+    private func footnoteDefinition(_ line: String) -> (id: String, text: String)? {
+        guard line.hasPrefix("[^") else { return nil }
+        guard let closing = line.range(of: "]:") else { return nil }
+        let id = String(line[line.index(line.startIndex, offsetBy: 2)..<closing.lowerBound])
+        guard !id.isEmpty, !id.contains(" ") else { return nil }
+        let text = String(line[closing.upperBound...]).trimmingCharacters(in: .whitespaces)
+        return (id, text)
+    }
+
+    private func collectFootnotes(_ lines: [String]) -> [Footnote] {
+        var footnotes: [Footnote] = []
+        for line in lines {
+            guard let definition = footnoteDefinition(line) else { continue }
+            footnotes.append(Footnote(id: definition.id, html: renderInline(definition.text)))
+        }
+        return footnotes
+    }
+
+    private func footnotesSection(_ footnotes: [Footnote]) -> String {
+        var items = ""
+        for footnote in footnotes {
+            let anchor = escapeAttribute(footnote.id)
+            items += "<li id=\"fn-\(anchor)\">\(footnote.html) <a href=\"#fnref-\(anchor)\" class=\"footnote-back\">↩</a></li>\n"
+        }
+        return "\n<section class=\"footnotes\"><hr><ol>\n\(items)</ol></section>"
     }
 
     // MARK: - Block parsing
@@ -23,6 +73,11 @@ struct MarkdownHTMLRenderer {
             let line = lines[index]
 
             if line.trimmingCharacters(in: .whitespaces).isEmpty {
+                index += 1
+                continue
+            }
+
+            if footnoteDefinition(line) != nil {
                 index += 1
                 continue
             }

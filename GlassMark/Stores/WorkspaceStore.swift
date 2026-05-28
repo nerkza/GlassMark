@@ -12,6 +12,7 @@ final class WorkspaceStore: ObservableObject {
     private let filePersistenceService = FilePersistenceService()
     private let defaultsKey = "knownWorkspaces"
     private var fileTreesByWorkspaceID: [Workspace.ID: [WorkspaceFile]] = [:]
+    private var fileTreeLoadToken = 0
 
     func restoreKnownWorkspaces() {
         guard let data = UserDefaults.standard.data(forKey: defaultsKey) else { return }
@@ -93,14 +94,42 @@ final class WorkspaceStore: ObservableObject {
             return
         }
 
-        do {
-            fileTree = try URLSecurityScope.withAccess(to: activeWorkspace.rootURL) {
-                try fileTreeService.loadTree(rootURL: activeWorkspace.rootURL)
+        let workspaceID = activeWorkspace.id
+        let rootURL = activeWorkspace.rootURL
+        let service = fileTreeService
+        fileTreeLoadToken += 1
+        let token = fileTreeLoadToken
+
+        // Load off the main thread so large workspaces don't block the UI.
+        Task.detached(priority: .userInitiated) {
+            var tree: [WorkspaceFile] = []
+            var failure: String?
+            do {
+                tree = try URLSecurityScope.withAccess(to: rootURL) {
+                    try service.loadTree(rootURL: rootURL)
+                }
+            } catch {
+                failure = error.localizedDescription
             }
-            fileTreesByWorkspaceID[activeWorkspace.id] = fileTree
-        } catch {
-            fileTree = fileTreesByWorkspaceID[activeWorkspace.id] ?? []
-            errorMessage = "Could not load workspace files: \(error.localizedDescription)"
+            let loaded = tree
+            await MainActor.run {
+                self.applyFileTree(loaded, failure: failure, workspaceID: workspaceID, token: token)
+            }
+        }
+    }
+
+    private func applyFileTree(_ tree: [WorkspaceFile], failure: String?, workspaceID: Workspace.ID, token: Int) {
+        guard token == fileTreeLoadToken else { return }
+
+        if let failure {
+            fileTree = fileTreesByWorkspaceID[workspaceID] ?? []
+            errorMessage = "Could not load workspace files: \(failure)"
+            return
+        }
+
+        fileTreesByWorkspaceID[workspaceID] = tree
+        if activeWorkspace?.id == workspaceID {
+            fileTree = tree
         }
     }
 

@@ -1,6 +1,6 @@
 import Foundation
 
-struct WorkspaceFile: Identifiable, Equatable, Hashable {
+struct WorkspaceFile: Identifiable, Equatable, Hashable, Sendable {
     let id: URL
     let url: URL
     let name: String

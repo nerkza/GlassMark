@@ -49,5 +49,15 @@ final class MarkdownRenderServiceTests: XCTestCase {
         let shell = service.documentShell(title: "T")
         XCTAssertTrue(shell.contains("id=\"content\""))
         XCTAssertTrue(shell.contains("function setContent"))
+        XCTAssertTrue(shell.contains("id=\"userTheme\""))
+        XCTAssertTrue(shell.contains("function setTheme"))
+    }
+
+    func testThemeCSSComposition() {
+        XCTAssertEqual(service.themeCSS(.system, customCSS: ""), "")
+        XCTAssertTrue(service.themeCSS(.sepia, customCSS: "").contains("f4ecd8"))
+        let combined = service.themeCSS(.dark, customCSS: "p { color: red; }")
+        XCTAssertTrue(combined.contains("#1e1e1e"))
+        XCTAssertTrue(combined.contains("p { color: red; }"))
     }
 }

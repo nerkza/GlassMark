@@ -138,4 +138,26 @@ final class MarkdownHTMLRendererTests: XCTestCase {
         XCTAssertEqual(MarkdownHTMLRenderer.slug(for: "Hello, World!"), "hello-world")
         XCTAssertEqual(MarkdownHTMLRenderer.slug(for: "Section 2.1 — Intro"), "section-21-intro")
     }
+
+    func testFootnotes() {
+        let markdown = """
+        Here is a note[^1] and another[^note].
+
+        [^1]: First footnote.
+        [^note]: Second footnote.
+        """
+        let html = renderer.renderBody(markdown)
+        XCTAssertTrue(html.contains("<sup class=\"footnote-ref\"><a href=\"#fn-1\" id=\"fnref-1\">1</a></sup>"))
+        XCTAssertTrue(html.contains("<sup class=\"footnote-ref\"><a href=\"#fn-note\" id=\"fnref-note\">2</a></sup>"))
+        XCTAssertTrue(html.contains("<section class=\"footnotes\">"))
+        XCTAssertTrue(html.contains("<li id=\"fn-1\">First footnote."))
+        XCTAssertTrue(html.contains("<li id=\"fn-note\">Second footnote."))
+        // Definition lines must not render as paragraphs.
+        XCTAssertFalse(html.contains("<p>[^1]: First footnote.</p>"))
+    }
+
+    func testNoFootnoteSectionWithoutDefinitions() {
+        let html = renderer.renderBody("Just a plain paragraph.")
+        XCTAssertFalse(html.contains("footnotes"))
+    }
 }

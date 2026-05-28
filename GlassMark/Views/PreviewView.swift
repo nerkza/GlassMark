@@ -5,6 +5,9 @@ import WebKit
 struct PreviewView: View {
     @EnvironmentObject private var documentStore: DocumentStore
     @EnvironmentObject private var commandStore: CommandStore
+    @EnvironmentObject private var preferencesStore: PreferencesStore
+
+    private let renderService = MarkdownRenderService()
 
     var body: some View {
         if let document = documentStore.document {
@@ -12,6 +15,7 @@ struct PreviewView: View {
                 markdown: document.text,
                 title: document.file.name,
                 baseURL: document.file.url.deletingLastPathComponent(),
+                themeCSS: renderService.themeCSS(preferencesStore.previewTheme, customCSS: preferencesStore.customPreviewCSS),
                 scrollRequest: commandStore.outlineScrollRequest,
                 scrollSync: commandStore.scrollSync,
                 onScroll: { commandStore.publishScroll(fraction: $0, source: .preview) }
@@ -29,6 +33,7 @@ private struct WebPreview: NSViewRepresentable {
     let markdown: String
     let title: String
     let baseURL: URL
+    let themeCSS: String
     let scrollRequest: OutlineScrollRequest?
     let scrollSync: ScrollSync?
     let onScroll: (Double) -> Void
@@ -51,12 +56,14 @@ private struct WebPreview: NSViewRepresentable {
         context.coordinator.onScroll = onScroll
 
         webView.loadHTMLString(renderService.documentShell(title: title), baseURL: baseURL)
+        context.coordinator.applyTheme(themeCSS)
         context.coordinator.scheduleRender(markdown: markdown)
         return webView
     }
 
     func updateNSView(_ webView: WKWebView, context: Context) {
         context.coordinator.onScroll = onScroll
+        context.coordinator.applyTheme(themeCSS)
         context.coordinator.scheduleRender(markdown: markdown)
         context.coordinator.handleScroll(request: scrollRequest)
         context.coordinator.handleScrollSync(scrollSync)
@@ -73,9 +80,25 @@ private struct WebPreview: NSViewRepresentable {
         private var renderWorkItem: DispatchWorkItem?
         private var lastHandledScrollID: UUID?
         private var lastHandledSyncToken: Int?
+        private var appliedTheme: String?
 
         init(renderService: MarkdownRenderService) {
             self.renderService = renderService
+        }
+
+        func applyTheme(_ css: String) {
+            guard appliedTheme != css else { return }
+            appliedTheme = css
+            guard isShellLoaded else { return }
+            inject(theme: css)
+        }
+
+        private func inject(theme css: String) {
+            guard let webView,
+                  let data = try? JSONSerialization.data(withJSONObject: [css]),
+                  let json = String(data: data, encoding: .utf8) else { return }
+            let literal = String(json.dropFirst().dropLast())
+            webView.evaluateJavaScript("setTheme(\(literal));", completionHandler: nil)
         }
 
         func handleScroll(request: OutlineScrollRequest?) {
@@ -143,6 +166,9 @@ private struct WebPreview: NSViewRepresentable {
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isShellLoaded = true
+            if let appliedTheme {
+                inject(theme: appliedTheme)
+            }
             if let pendingMarkdown {
                 self.pendingMarkdown = nil
                 inject(body: pendingMarkdown)

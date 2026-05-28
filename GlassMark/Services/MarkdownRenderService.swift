@@ -25,6 +25,7 @@ struct MarkdownRenderService {
           <meta name="viewport" content="width=device-width, initial-scale=1">
           <title>\(escape(title))</title>
           <style>\(Self.css)</style>
+          <style id="userTheme"></style>
         </head>
         <body>
           <main id="content"></main>
@@ -32,6 +33,11 @@ struct MarkdownRenderService {
         </body>
         </html>
         """
+    }
+
+    /// Combined theme + custom CSS injected into the preview via `setTheme`.
+    func themeCSS(_ theme: PreviewTheme, customCSS: String) -> String {
+        [theme.css, customCSS].filter { !$0.isEmpty }.joined(separator: "\n")
     }
 
     /// Complete standalone document, used for HTML/PDF export and tests.
@@ -136,6 +142,10 @@ struct MarkdownRenderService {
         headings[ordinal].scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
+    function setTheme(css) {
+      var el = document.getElementById('userTheme');
+      if (el) { el.textContent = css; }
+    }
     window.addEventListener('scroll', function () {
       if (suppressScroll) return;
       var doc = document.scrollingElement || document.documentElement;
@@ -231,6 +241,11 @@ struct MarkdownRenderService {
     th { background: color-mix(in srgb, CanvasText 7%, Canvas); font-weight: 600; }
     tr:nth-child(even) td { background: color-mix(in srgb, CanvasText 3%, Canvas); }
     img { max-width: 100%; border-radius: 8px; }
+    sup.footnote-ref { font-size: 0.72em; line-height: 0; }
+    sup.footnote-ref a { text-decoration: none; padding: 0 0.15em; }
+    .footnotes { margin-top: 3em; font-size: 0.9em; color: color-mix(in srgb, CanvasText 78%, Canvas); }
+    .footnotes hr { margin-bottom: 1.2em; }
+    .footnote-back { text-decoration: none; padding-left: 0.3em; }
     .frontmatter {
       margin: 0 0 1.4em;
       padding: 4px 16px;

@@ -4,6 +4,7 @@ import SwiftUI
 struct EditorView: View {
     @EnvironmentObject private var documentStore: DocumentStore
     @EnvironmentObject private var commandStore: CommandStore
+    @EnvironmentObject private var preferencesStore: PreferencesStore
 
     var body: some View {
         VStack(spacing: 0) {
@@ -22,7 +23,9 @@ struct EditorView: View {
                     scrollRequest: scrollRequestBinding,
                     activeLocation: activeLocationBinding,
                     scrollSync: commandStore.scrollSync,
-                    onScroll: { commandStore.publishScroll(fraction: $0, source: .editor) }
+                    onScroll: { commandStore.publishScroll(fraction: $0, source: .editor) },
+                    focusMode: preferencesStore.focusModeEnabled,
+                    typewriterMode: preferencesStore.typewriterModeEnabled
                 )
             }
 
@@ -164,6 +167,8 @@ private struct MarkdownTextView: NSViewRepresentable {
     @Binding var activeLocation: Int
     let scrollSync: ScrollSync?
     let onScroll: (Double) -> Void
+    let focusMode: Bool
+    let typewriterMode: Bool
 
     func makeCoordinator() -> Coordinator {
         Coordinator(text: $text, activeLocation: $activeLocation)
@@ -209,6 +214,8 @@ private struct MarkdownTextView: NSViewRepresentable {
         scrollView.documentView = textView
         context.coordinator.textView = textView
         context.coordinator.onScroll = onScroll
+        context.coordinator.focusMode = focusMode
+        context.coordinator.typewriterMode = typewriterMode
         context.coordinator.observeScrolling(of: scrollView)
         context.coordinator.applyHighlighting()
         return scrollView
@@ -220,6 +227,12 @@ private struct MarkdownTextView: NSViewRepresentable {
         context.coordinator.text = $text
         context.coordinator.activeLocation = $activeLocation
         context.coordinator.onScroll = onScroll
+
+        if context.coordinator.focusMode != focusMode || context.coordinator.typewriterMode != typewriterMode {
+            context.coordinator.focusMode = focusMode
+            context.coordinator.typewriterMode = typewriterMode
+            context.coordinator.applyHighlighting()
+        }
 
         if let scrollSync, scrollSync.source == .preview,
            context.coordinator.lastHandledSyncToken != scrollSync.token {
@@ -255,11 +268,14 @@ private struct MarkdownTextView: NSViewRepresentable {
         var lastHandledCommandID: UUID?
         var lastHandledScrollID: UUID?
         var lastHandledSyncToken: Int?
+        var focusMode = false
+        var typewriterMode = false
 
         private let highlighter = MarkdownSyntaxHighlighter()
         private let baseFont = NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
         private var isObservingScrolling = false
         private var isApplyingExternalScroll = false
+        private var highlightWorkItem: DispatchWorkItem?
 
         init(text: Binding<String>, activeLocation: Binding<Int>) {
             self.text = text
@@ -316,19 +332,122 @@ private struct MarkdownTextView: NSViewRepresentable {
         func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView else { return }
             text.wrappedValue = textView.string
-            applyHighlighting()
+            scheduleHighlighting()
         }
 
         func textViewDidChangeSelection(_ notification: Notification) {
             updateActiveLocation()
+            if focusMode { applyHighlighting() }
+            if typewriterMode { centerCaret() }
+        }
+
+        private func scheduleHighlighting() {
+            highlightWorkItem?.cancel()
+            let workItem = DispatchWorkItem { [weak self] in self?.applyHighlighting() }
+            highlightWorkItem = workItem
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: workItem)
+        }
+
+        // MARK: - Key handling (auto-pairing, lists, tables)
+
+        func textView(
+            _ textView: NSTextView,
+            shouldChangeTextIn affectedCharRange: NSRange,
+            replacementString: String?
+        ) -> Bool {
+            guard let replacementString else { return true }
+            return handleAutoPairing(in: textView, range: affectedCharRange, replacement: replacementString)
+        }
+
+        func textView(_ textView: NSTextView, doCommandBy selector: Selector) -> Bool {
+            if selector == #selector(NSResponder.insertNewline(_:)) {
+                return continueListIfNeeded(in: textView)
+            }
+            if selector == #selector(NSResponder.insertTab(_:)) {
+                return moveToTableCell(in: textView, forward: true)
+            }
+            if selector == #selector(NSResponder.insertBacktab(_:)) {
+                return moveToTableCell(in: textView, forward: false)
+            }
+            return false
+        }
+
+        // MARK: - Auto-pairing
+
+        private static let pairs: [Character: Character] = ["(": ")", "[": "]", "{": "}", "`": "`"]
+        private static let wrappers: [Character: (String, String)] = [
+            "(": ("(", ")"), "[": ("[", "]"), "{": ("{", "}"),
+            "`": ("`", "`"), "*": ("*", "*"), "_": ("_", "_"), "~": ("~", "~")
+        ]
+
+        private func handleAutoPairing(in textView: NSTextView, range: NSRange, replacement: String) -> Bool {
+            guard replacement.count == 1, let character = replacement.first else { return true }
+            let nsString = textView.string as NSString
+
+            // Wrap a non-empty selection with the matching delimiters.
+            if range.length > 0, let wrapper = Self.wrappers[character] {
+                let selected = nsString.substring(with: range)
+                let wrapped = "\(wrapper.0)\(selected)\(wrapper.1)"
+                textView.insertText(wrapped, replacementRange: range)
+                textView.setSelectedRange(NSRange(location: range.location + wrapper.0.utf16.count, length: (selected as NSString).length))
+                return false
+            }
+
+            guard range.length == 0 else { return true }
+
+            // Skip over an existing closing character instead of inserting a duplicate.
+            if character == ")" || character == "]" || character == "}" || character == "`" {
+                if range.location < nsString.length,
+                   nsString.substring(with: NSRange(location: range.location, length: 1)) == String(character) {
+                    textView.setSelectedRange(NSRange(location: range.location + 1, length: 0))
+                    return false
+                }
+            }
+
+            // Auto-close brackets and backticks (not * or _, which fight bold/italic typing).
+            if let close = Self.pairs[character] {
+                textView.insertText("\(character)\(close)", replacementRange: range)
+                textView.setSelectedRange(NSRange(location: range.location + 1, length: 0))
+                return false
+            }
+
+            return true
+        }
+
+        // MARK: - Table navigation
+
+        private func moveToTableCell(in textView: NSTextView, forward: Bool) -> Bool {
+            let nsString = textView.string as NSString
+            let caret = textView.selectedRange().location
+            let lineRange = nsString.lineRange(for: NSRange(location: caret, length: 0))
+            let line = nsString.substring(with: lineRange)
+            guard line.contains("|") else { return false }
+
+            if forward {
+                // Find the next pipe at or after the caret on this line.
+                let searchStart = caret
+                let searchRange = NSRange(location: searchStart, length: lineRange.location + lineRange.length - searchStart)
+                let pipe = nsString.range(of: "|", range: searchRange)
+                guard pipe.location != NSNotFound else { return false }
+                var cellStart = pipe.location + 1
+                while cellStart < nsString.length,
+                      nsString.substring(with: NSRange(location: cellStart, length: 1)) == " " {
+                    cellStart += 1
+                }
+                textView.setSelectedRange(NSRange(location: min(cellStart, nsString.length), length: 0))
+                return true
+            } else {
+                // Move to the start of the previous cell.
+                let before = NSRange(location: lineRange.location, length: max(0, caret - lineRange.location))
+                let beforeText = nsString.substring(with: before)
+                guard let lastPipe = beforeText.range(of: "|", options: .backwards) else { return false }
+                let pipeOffset = beforeText.distance(from: beforeText.startIndex, to: lastPipe.lowerBound)
+                textView.setSelectedRange(NSRange(location: lineRange.location + pipeOffset, length: 0))
+                return true
+            }
         }
 
         // MARK: - List continuation
-
-        func textView(_ textView: NSTextView, doCommandBy selector: Selector) -> Bool {
-            guard selector == #selector(NSResponder.insertNewline(_:)) else { return false }
-            return continueListIfNeeded(in: textView)
-        }
 
         private func continueListIfNeeded(in textView: NSTextView) -> Bool {
             let nsString = textView.string as NSString
@@ -521,7 +640,44 @@ private struct MarkdownTextView: NSViewRepresentable {
                 }
             }
 
+            if focusMode {
+                applyFocusDim(to: textStorage, textView: textView)
+            }
+
             textStorage.endEditing()
+        }
+
+        /// Dims everything except the paragraph containing the caret.
+        private func applyFocusDim(to storage: NSTextStorage, textView: NSTextView) {
+            let nsString = textView.string as NSString
+            guard nsString.length > 0 else { return }
+            let caret = min(textView.selectedRange().location, nsString.length)
+            let focusRange = nsString.paragraphRange(for: NSRange(location: caret, length: 0))
+
+            let dim = NSColor.textColor.withAlphaComponent(0.32)
+            if focusRange.location > 0 {
+                storage.addAttribute(.foregroundColor, value: dim, range: NSRange(location: 0, length: focusRange.location))
+            }
+            let tailStart = focusRange.location + focusRange.length
+            if tailStart < nsString.length {
+                storage.addAttribute(.foregroundColor, value: dim, range: NSRange(location: tailStart, length: nsString.length - tailStart))
+            }
+        }
+
+        /// Keeps the caret line vertically centered (typewriter scrolling).
+        private func centerCaret() {
+            guard let textView,
+                  let layoutManager = textView.layoutManager,
+                  let scrollView = textView.enclosingScrollView else { return }
+            let caret = textView.selectedRange().location
+            let glyphRange = layoutManager.glyphRange(forCharacterRange: NSRange(location: caret, length: 0), actualCharacterRange: nil)
+            let caretRect = layoutManager.lineFragmentRect(forGlyphAt: min(glyphRange.location, max(0, layoutManager.numberOfGlyphs - 1)), effectiveRange: nil)
+            let clipHeight = scrollView.contentView.bounds.height
+            let targetY = caretRect.midY + textView.textContainerInset.height - clipHeight / 2
+            let documentHeight = (scrollView.documentView?.frame.height ?? clipHeight)
+            let clampedY = max(0, min(targetY, max(0, documentHeight - clipHeight)))
+            scrollView.contentView.setBoundsOrigin(NSPoint(x: 0, y: clampedY))
+            scrollView.reflectScrolledClipView(scrollView.contentView)
         }
 
         private func apply(_ token: MarkdownToken, to storage: NSTextStorage) {

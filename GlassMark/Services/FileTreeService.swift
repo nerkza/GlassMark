@@ -1,6 +1,6 @@
 import Foundation
 
-struct FileTreeService {
+struct FileTreeService: Sendable {
     private let ignoredNames: Set<String> = [
         ".git",
         ".build",

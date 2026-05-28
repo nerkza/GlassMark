@@ -4,6 +4,7 @@ struct AppCommands: Commands {
     @ObservedObject var workspaceStore: WorkspaceStore
     @ObservedObject var documentStore: DocumentStore
     @ObservedObject var commandStore: CommandStore
+    @ObservedObject var preferencesStore: PreferencesStore
 
     var body: some Commands {
         CommandGroup(after: .newItem) {
@@ -57,6 +58,10 @@ struct AppCommands: Commands {
             }
             .keyboardShortcut("0", modifiers: [.command, .option])
             .disabled(documentStore.document == nil)
+
+            Toggle("Focus Mode", isOn: $preferencesStore.focusModeEnabled)
+                .keyboardShortcut("f", modifiers: [.command, .control])
+            Toggle("Typewriter Scrolling", isOn: $preferencesStore.typewriterModeEnabled)
         }
 
         CommandGroup(after: .sidebar) {

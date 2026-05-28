@@ -24,7 +24,8 @@ struct GlassMarkApp: App {
             AppCommands(
                 workspaceStore: workspaceStore,
                 documentStore: documentStore,
-                commandStore: commandStore
+                commandStore: commandStore,
+                preferencesStore: preferencesStore
             )
         }
 
